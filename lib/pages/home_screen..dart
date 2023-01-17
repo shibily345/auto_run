@@ -57,9 +57,19 @@ class _homeScreenState extends State<homeScreen> {
     '**** **** **** 1233',
     '**** **** **** 4352'
   ];
+  LocationData? currentLocation;
+  void getCurrentLocation() {
+    locationo.Location location = locationo.Location();
+    location.getLocation().then((location) {
+      currentLocation = location;
+      setState(() {});
+    });
+  }
 
   @override
   void initState() {
+    getCurrentLocation();
+    loadCustomMarker();
     super.initState();
 
     authController.getUserInfo();
@@ -67,22 +77,11 @@ class _homeScreenState extends State<homeScreen> {
     rootBundle.loadString('assets/map_style.txt').then((String) {
       _mapStyle = String;
     });
-    getCurrentLocation();
-    loadCustomMarker();
   }
 
   String dropdownValue = '**** **** **** 8789';
 
   GoogleMapController? myMapController;
-
-  LocationData? currentLocation;
-
-  void getCurrentLocation() {
-    locationo.Location location = locationo.Location();
-    location.getLocation().then((location) {
-      currentLocation = location;
-    });
-  }
 
   // final PanelController panelController;
 
@@ -96,7 +95,8 @@ class _homeScreenState extends State<homeScreen> {
       body: SlidingUpPanel(
         color: NeumorphicColors.darkBackground,
         controller: panalController,
-        minHeight: Get.height * 0.45,
+        minHeight: Get.height * 0.4,
+        maxHeight: Get.height * 0.8,
         panelBuilder: (controller) => panelWidget(
           controller: controller,
           panalController: panalController,
@@ -111,20 +111,25 @@ class _homeScreenState extends State<homeScreen> {
               left: 0,
               right: 0,
               bottom: 0,
-              child: GoogleMap(
-                markers: markers,
-                polylines: polyline,
-                zoomControlsEnabled: false,
-                onMapCreated: (GoogleMapController controller) {
-                  myMapController = controller;
+              child: currentLocation == null
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : GoogleMap(
+                      markers: markers,
+                      polylines: polyline,
+                      zoomControlsEnabled: false,
+                      onMapCreated: (GoogleMapController controller) {
+                        myMapController = controller;
 
-                  myMapController!.setMapStyle(_mapStyle);
-                },
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(10.1632, 76.6413),
-                  zoom: 8,
-                ),
-              ),
+                        myMapController!.setMapStyle(_mapStyle);
+                      },
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(currentLocation!.latitude!,
+                            currentLocation!.longitude!),
+                        zoom: 15,
+                      ),
+                    ),
             ),
             // Padding(
             //   padding: const EdgeInsets.only(top: 50.0, left: 20),
@@ -158,13 +163,13 @@ class _homeScreenState extends State<homeScreen> {
             showSourceField
                 ? buildTextFieldFrom()
                 : Container(
-                    padding: EdgeInsets.only(left: 26),
-                    width: Get.width * 0.75,
+                    padding: EdgeInsets.symmetric(horizontal: 26),
                     height: 106,
+                    width: Get.width,
                     child: buildDriversList(),
                   ),
-            Spacer(),
-            buildCurrentLocationIcon(),
+            // Spacer(),
+            // buildCurrentLocationIcon(),
           ],
         ),
         bigspace,
@@ -463,7 +468,7 @@ class _homeScreenState extends State<homeScreen> {
       language: "en",
       context: context,
       mode: Mode.overlay,
-      apiKey: "AIzaSyBEh1TK5IbinaixvHUcB4_b1AHKwWrkuic",
+      apiKey: apikey,
       components: [new Component(Component.country, "in")],
       types: [],
       hint: "Search City",
