@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:auto_run/pages/settings.dart';
 import 'package:auto_run/widgets/destination_sheet.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:google_maps_webservice/places.dart';
@@ -1289,7 +1290,11 @@ buildDrawer() {
                   title: 'Ride History', onPressed: () {}, isVisible: true),
               buildDrawerItem(title: 'Save a Location', onPressed: () {}),
               buildDrawerItem(title: 'Promo Codes', onPressed: () {}),
-              buildDrawerItem(title: 'Settings', onPressed: () {}),
+              buildDrawerItem(
+                  title: 'Settings',
+                  onPressed: () {
+                    Get.to(SettingsScreen());
+                  }),
               buildDrawerItem(title: 'Support', onPressed: () {}),
               buildDrawerItem(
                   title: 'Log Out',
