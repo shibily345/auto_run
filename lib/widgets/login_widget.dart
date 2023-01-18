@@ -1,15 +1,11 @@
 import 'package:auto_run/core/const.dart';
-import 'package:auto_run/pages/otp_ver_page.dart';
-import 'package:auto_run/pages/profile_setting.dart';
 import 'package:auto_run/widgets/textwidgetsmall.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Widget loginWidget(
-    CountryCode countryCode, Function onCountrychange, Function onSubmit) {
+Widget loginWidget(BuildContext context, CountryCode countryCode,
+    Function onCountrychange, Function onSubmit) {
   return Expanded(
     child: Padding(
       padding: const EdgeInsets.symmetric(
@@ -18,10 +14,12 @@ Widget loginWidget(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          textWidget(text: 'Hello, Nice To Meet You', color1: yellow),
+          textWidget(
+              text: 'Hello, Nice To Meet You',
+              color1: Theme.of(context).indicatorColor),
           textWidget(
             text: "Go With Riksaw 'Wherever Whenever'",
-            color1: grey,
+            color1: Theme.of(context).primaryColorDark,
             fontSize1: 20,
             fontWeight1: FontWeight.bold,
           ),
@@ -31,18 +29,18 @@ Widget loginWidget(
             width: double.infinity,
             height: 65,
             decoration: BoxDecoration(
-                color: Color.fromARGB(255, 127, 127, 127),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
                   BoxShadow(
-                    blurRadius: 30,
-                    offset: Offset(20, 20),
-                    color: Color.fromARGB(41, 0, 0, 0),
+                    blurRadius: 10,
+                    offset: const Offset(10, 10),
+                    color: Theme.of(context).splashColor,
                   ),
                   BoxShadow(
-                    blurRadius: 30,
-                    offset: Offset(-20, -20),
-                    color: Color.fromARGB(41, 246, 241, 241),
+                    blurRadius: 10,
+                    offset: const Offset(-10, -10),
+                    color: Theme.of(context).shadowColor,
                   ),
                 ]),
             child: Row(
@@ -62,9 +60,12 @@ Widget loginWidget(
                                 ),
                               ),
                             ),
-                            textWidget(text: countryCode.dialCode),
+                            textWidget(
+                                text: countryCode.dialCode,
+                                color1: Theme.of(context).primaryColorDark),
                             Icon(
                               Icons.keyboard_arrow_down_rounded,
+                              color: Theme.of(context).indicatorColor,
                             ),
                           ],
                         ),
@@ -77,25 +78,20 @@ Widget loginWidget(
                     child: Container(
                       child: Center(
                         child: TextField(
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColorDark),
                           onSubmitted: (String? input) => onSubmit(input),
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                               hintText: 'Enter Your Phone Number',
-                              hintStyle: GoogleFonts.poppins(),
+                              hintStyle: GoogleFonts.poppins(
+                                  color: Theme.of(context).primaryColorDark),
                               border: InputBorder.none),
                         ),
                       ),
                     ),
                   ),
                 ),
-                // IconButton(
-                //   onPressed: () {
-                //     Get.to(() => ProfileSettingScreen());
-                //   },
-                //   icon: Icon(
-                //     CupertinoIcons.arrow_right_circle_fill,
-                //   ),
-                // )
               ],
             ),
           ),
@@ -112,23 +108,27 @@ Widget loginWidget(
                     style: GoogleFonts.poppins(color: bc, fontSize: 12),
                     children: [
                       TextSpan(
-                        style: TextStyle(color: grey),
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorDark),
                         text:
                             'By creating an account, you agree to our Privacy Policy\n',
                       ),
                       TextSpan(
                         text: ' Terms of Service ',
                         style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold, color: grey),
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColorDark),
                       ),
                       TextSpan(
                         text: 'and ',
-                        style: TextStyle(color: grey),
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorDark),
                       ),
                       TextSpan(
                           text: 'Privacy Policy',
                           style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.bold, color: grey)),
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColorDark)),
                     ])),
           )
         ],

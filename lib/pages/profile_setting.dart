@@ -241,10 +241,10 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
           width: Get.width,
           // height: 50,
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Theme.of(context).primaryColor,
                     spreadRadius: 1,
                     blurRadius: 1)
               ],
@@ -257,7 +257,7 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xffA7A7A7)),
+                color: Theme.of(context).primaryColor),
             decoration: InputDecoration(
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 10),
@@ -284,7 +284,9 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
       child: Text(
         title,
         style: GoogleFonts.poppins(
-            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColorDark),
       ),
     );
   }

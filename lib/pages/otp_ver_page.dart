@@ -1,5 +1,4 @@
 import 'package:auto_run/controller/auth_controller.dart';
-import 'package:auto_run/core/const.dart';
 import 'package:auto_run/widgets/green_intro.dart';
 import 'package:auto_run/widgets/otp_ver_widget.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +24,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: nbcb,
+      backgroundColor: Theme.of(context).primaryColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -44,11 +43,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       height: 45,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color.fromARGB(255, 42, 42, 42),
+                        color: Theme.of(context).primaryColor,
                       ),
                       child: Icon(
                         Icons.arrow_back,
-                        color: yellow,
+                        color: Theme.of(context).indicatorColor,
                         size: 20,
                       ),
                     ),
@@ -56,10 +55,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 50,
             ),
-            otpWidget(),
+            otpWidget(context),
           ],
         ),
       ),

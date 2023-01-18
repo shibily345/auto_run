@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:auto_run/core/const.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +56,7 @@ Widget greenIntroWidgetWithoutLogos(
                   letterSpacing: 1,
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 0, 0, 0)),
+                  color: bc),
             ),
             if (subtitle != null)
               Text(

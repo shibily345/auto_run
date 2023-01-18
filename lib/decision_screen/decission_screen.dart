@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controller/auth_controller.dart';
-import '../driver/profile_setup.dart';
 import '../pages/login_screen.dart';
 import '../widgets/green_intro.dart';
 import '../widgets/my_button.dart';
@@ -17,8 +16,8 @@ class DecisionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: nbcb,
-      body: Container(
+      backgroundColor: Theme.of(context).primaryColor,
+      body: SizedBox(
         width: double.infinity,
         child: Column(
           children: [
@@ -28,20 +27,21 @@ class DecisionScreen extends StatelessWidget {
                 text: 'Welcome...!',
                 fontSize1: 30,
                 fontWeight1: FontWeight.w400,
-                color1: Colors.grey),
+                color1: Theme.of(context).primaryColorDark),
             const SizedBox(
               height: 50,
             ),
-            DecisionButton('assets/driver.png', 'Login As Driver', () {
+            DecisionButton(context, Icons.local_taxi_rounded, 'Login As Driver',
+                () {
               authController.isLoginAsDriver = true;
-              Get.to(() => LoginPage());
+              Get.to(() => const LoginPage());
             }, Get.width * 0.8),
             const SizedBox(
               height: 30,
             ),
-            DecisionButton('assets/customer.png', 'Login As User', () {
+            DecisionButton(context, Icons.person, 'Login As User', () {
               authController.isLoginAsDriver = false;
-              Get.to(() => LoginPage());
+              Get.to(() => const LoginPage());
             }, Get.width * 0.8),
             bigspace,
             bigspace,

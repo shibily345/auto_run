@@ -1,6 +1,8 @@
 import 'dart:ui' as ui;
 import 'package:auto_run/decision_screen/decission_screen.dart';
+import 'package:auto_run/pages/profile_setting.dart';
 import 'package:auto_run/pages/settings.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:auto_run/controller/auth_controller.dart';
@@ -8,10 +10,8 @@ import 'package:auto_run/controller/polyline_handler.dart';
 import 'package:auto_run/core/const.dart';
 import 'package:auto_run/model/userModel.dart';
 import 'package:auto_run/pages/payment.dart';
-import 'package:auto_run/pages/profile_setting.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -19,10 +19,13 @@ import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:geocoding/geocoding.dart' as geoCoding;
 import 'package:location/location.dart' as locationo;
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import '../core/theam_provider.dart';
 import '../widgets/slide_up.dart';
 import '../widgets/text_widget.dart';
+import '../widgets/theme_change_button.dart';
 import 'my_profile.dart';
 
 class homeScreen extends StatefulWidget {
@@ -34,6 +37,7 @@ class homeScreen extends StatefulWidget {
 
 class _homeScreenState extends State<homeScreen> {
   String? _mapStyle;
+  String? _mapStyleLight;
   AuthController authController = Get.find<AuthController>();
   final panalController = PanelController();
   var myUser = UserModel().obs;
@@ -70,6 +74,9 @@ class _homeScreenState extends State<homeScreen> {
     rootBundle.loadString('assets/map_style.txt').then((String) {
       _mapStyle = String;
     });
+    rootBundle.loadString('assets/map_style_light.txt').then((String) {
+      _mapStyleLight = String;
+    });
   }
 
   String dropdownValue = '**** **** **** 8789';
@@ -80,10 +87,14 @@ class _homeScreenState extends State<homeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mapStyle =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+            ? _mapStyle
+            : _mapStyleLight;
     return Scaffold(
-      drawer: buildDrawer(),
+      drawer: buildDrawer(context),
       body: SlidingUpPanel(
-        color: nbcb,
+        color: Theme.of(context).primaryColor,
         controller: panalController,
         minHeight: Get.height * 0.4,
         maxHeight: Get.height * 0.8,
@@ -111,8 +122,9 @@ class _homeScreenState extends State<homeScreen> {
                       zoomControlsEnabled: false,
                       onMapCreated: (GoogleMapController controller) {
                         myMapController = controller;
-
-                        myMapController!.setMapStyle(_mapStyle);
+                        setState(() {
+                          myMapController!.setMapStyle(mapStyle);
+                        });
                       },
                       initialCameraPosition: CameraPosition(
                         target: LatLng(currentLocation!.latitude!,
@@ -189,18 +201,18 @@ class _homeScreenState extends State<homeScreen> {
                         height: 100,
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
-                            color: nbcb,
+                            color: Theme.of(context).primaryColor,
                             borderRadius: BorderRadius.circular(8),
-                            boxShadow: const [
+                            boxShadow: [
                               BoxShadow(
                                 blurRadius: 10,
-                                offset: Offset(10, 10),
-                                color: shadowD,
+                                offset: const Offset(10, 10),
+                                color: Theme.of(context).splashColor,
                               ),
                               BoxShadow(
                                 blurRadius: 10,
-                                offset: Offset(-10, -10),
-                                color: shadowL,
+                                offset: const Offset(-10, -10),
+                                color: Theme.of(context).shadowColor,
                               ),
                             ]),
                         child: Column(
@@ -220,8 +232,9 @@ class _homeScreenState extends State<homeScreen> {
                                 children: [
                                   Text(
                                     authController.myUser.value.hAddress!,
-                                    style: const TextStyle(
-                                        color: grey,
+                                    style: TextStyle(
+                                        color:
+                                            Theme.of(context).primaryColorDark,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600),
                                     textAlign: TextAlign.start,
@@ -238,10 +251,15 @@ class _homeScreenState extends State<homeScreen> {
                     ),
                     InkWell(
                       onTap: () async {
-                        authController.myUser.value.bussinessAddres == null
-                            ? Get.dialog(textWidget(text: 'Add A adress'))
-                            : destinationController.text =
-                                authController.myUser.value.bAddress!;
+                        authController.myUser.value.bAddress! == null
+                            ? const Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : authController.myUser.value.bussinessAddres ==
+                                    null
+                                ? Get.dialog(textWidget(text: 'Add A adress'))
+                                : destinationController.text =
+                                    authController.myUser.value.bAddress!;
                         destination =
                             authController.myUser.value.bussinessAddres!;
                         if (markers.length >= 2) {
@@ -261,7 +279,9 @@ class _homeScreenState extends State<homeScreen> {
                         myMapController!.animateCamera(
                             CameraUpdate.newCameraPosition(
                                 CameraPosition(target: destination, zoom: 14)));
-                        setState(() {});
+                        setState(() {
+                          showSourceField = true;
+                        });
                         Get.back();
                       },
                       child: Container(
@@ -269,18 +289,18 @@ class _homeScreenState extends State<homeScreen> {
                         height: 100,
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
-                            color: nbcb,
+                            color: Theme.of(context).primaryColor,
                             borderRadius: BorderRadius.circular(8),
-                            boxShadow: const [
+                            boxShadow: [
                               BoxShadow(
                                 blurRadius: 10,
-                                offset: Offset(10, 10),
-                                color: shadowD,
+                                offset: const Offset(10, 10),
+                                color: Theme.of(context).splashColor,
                               ),
                               BoxShadow(
                                 blurRadius: 10,
-                                offset: Offset(-10, -10),
-                                color: shadowL,
+                                offset: const Offset(-10, -10),
+                                color: Theme.of(context).shadowColor,
                               ),
                             ]),
                         child: Column(
@@ -300,8 +320,9 @@ class _homeScreenState extends State<homeScreen> {
                                 children: [
                                   Text(
                                     authController.myUser.value.bAddress!,
-                                    style: const TextStyle(
-                                        color: grey,
+                                    style: TextStyle(
+                                        color:
+                                            Theme.of(context).primaryColorDark,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600),
                                     textAlign: TextAlign.start,
@@ -332,7 +353,7 @@ class _homeScreenState extends State<homeScreen> {
           width: 50,
           height: 5,
           decoration: BoxDecoration(
-            color: grey,
+            color: Theme.of(context).primaryColorDark,
             borderRadius: BorderRadius.circular(12),
           ),
         ),
@@ -358,18 +379,18 @@ class _homeScreenState extends State<homeScreen> {
                     height: 30,
                     width: Get.width * 0.6,
                     decoration: BoxDecoration(
-                        color: nbcb,
+                        color: Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.circular(8),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
                             blurRadius: 10,
-                            offset: Offset(10, 10),
-                            color: shadowD,
+                            offset: const Offset(10, 10),
+                            color: Theme.of(context).splashColor,
                           ),
                           BoxShadow(
                             blurRadius: 10,
-                            offset: Offset(-10, -10),
-                            color: shadowL,
+                            offset: const Offset(-10, -10),
+                            color: Theme.of(context).shadowColor,
                           ),
                         ]),
                     child: const Center(
@@ -392,7 +413,7 @@ class _homeScreenState extends State<homeScreen> {
               padding: const EdgeInsets.symmetric(
                 horizontal: 20,
               ),
-              decoration: const BoxDecoration(color: nbcb),
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -406,9 +427,11 @@ class _homeScreenState extends State<homeScreen> {
                     children: [
                       RichText(
                         text: TextSpan(children: [
-                          const TextSpan(
+                          TextSpan(
                               text: 'Good Morning, ',
-                              style: TextStyle(color: grey, fontSize: 14)),
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColorDark,
+                                  fontSize: 14)),
                           TextSpan(
                               text: authController.myUser.value.name,
                               style: const TextStyle(
@@ -417,12 +440,12 @@ class _homeScreenState extends State<homeScreen> {
                                   fontWeight: FontWeight.bold)),
                         ]),
                       ),
-                      const Text(
+                      Text(
                         "Where are you going?",
                         style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: grey),
+                            color: Theme.of(context).primaryColorDark),
                       )
                     ],
                   ),
@@ -445,18 +468,18 @@ class _homeScreenState extends State<homeScreen> {
         height: 50,
         padding: const EdgeInsets.only(left: 15),
         decoration: BoxDecoration(
-            color: nbcb,
+            color: Theme.of(context).primaryColor,
             borderRadius: BorderRadius.circular(8),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
                 blurRadius: 10,
-                offset: Offset(10, 10),
-                color: shadowD,
+                offset: const Offset(10, 10),
+                color: Theme.of(context).splashColor,
               ),
               BoxShadow(
                 blurRadius: 10,
-                offset: Offset(-10, -10),
-                color: shadowL,
+                offset: const Offset(-10, -10),
+                color: Theme.of(context).shadowColor,
               ),
             ]),
         child: TextFormField(
@@ -492,13 +515,14 @@ class _homeScreenState extends State<homeScreen> {
             });
           },
           style: GoogleFonts.poppins(
+            color: Theme.of(context).primaryColorDark,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
           decoration: InputDecoration(
             hintText: 'Search for a destination',
             hintStyle: GoogleFonts.poppins(
-              color: grey,
+              color: Theme.of(context).primaryColorDark,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -541,18 +565,18 @@ class _homeScreenState extends State<homeScreen> {
         height: 50,
         padding: const EdgeInsets.only(left: 15),
         decoration: BoxDecoration(
-            color: nbcb,
+            color: Theme.of(context).primaryColor,
             borderRadius: BorderRadius.circular(8),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
                 blurRadius: 10,
-                offset: Offset(10, 10),
-                color: shadowD,
+                offset: const Offset(10, 10),
+                color: Theme.of(context).splashColor,
               ),
               BoxShadow(
                 blurRadius: 10,
-                offset: Offset(-10, -10),
-                color: shadowL,
+                offset: const Offset(-10, -10),
+                color: Theme.of(context).shadowColor,
               ),
             ]),
         child: TextFormField(
@@ -562,6 +586,7 @@ class _homeScreenState extends State<homeScreen> {
             buildSourceSheet();
           },
           style: GoogleFonts.poppins(
+            color: Theme.of(context).primaryColorDark,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -598,9 +623,9 @@ class _homeScreenState extends State<homeScreen> {
                         currentLocation!.longitude!),
                     zoom: 14)));
           },
-          child: const Icon(
+          child: Icon(
             Icons.my_location_outlined,
-            color: yellow,
+            color: Theme.of(context).primaryColorDark,
           ),
         ),
       ),
@@ -608,12 +633,12 @@ class _homeScreenState extends State<homeScreen> {
   }
 
   NeumorphicStyle nmStyle() {
-    return const NeumorphicStyle(
-      shadowDarkColor: bc,
-      shadowLightColor: grey,
-      color: nbcb,
+    return NeumorphicStyle(
+      shadowDarkColor: Theme.of(context).primaryColorDark,
+      shadowLightColor: Theme.of(context).primaryColorDark,
+      color: Theme.of(context).primaryColor,
       shape: NeumorphicShape.convex,
-      boxShape: NeumorphicBoxShape.circle(),
+      boxShape: const NeumorphicBoxShape.circle(),
     );
   }
 
@@ -660,10 +685,10 @@ class _homeScreenState extends State<homeScreen> {
       width: Get.width,
       height: Get.height * 0.5,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-          color: grey),
+          color: Theme.of(context).primaryColorDark),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -671,18 +696,22 @@ class _homeScreenState extends State<homeScreen> {
           const SizedBox(
             height: 10,
           ),
-          const Text(
+          Text(
             "Select Your Location",
-            style:
-                TextStyle(color: bc, fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Theme.of(context).primaryColorDark,
+                fontSize: 20,
+                fontWeight: FontWeight.bold),
           ),
           const SizedBox(
             height: 20,
           ),
-          const Text(
+          Text(
             "Home Address",
-            style:
-                TextStyle(color: bc, fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Theme.of(context).primaryColorDark,
+                fontSize: 16,
+                fontWeight: FontWeight.bold),
           ),
           const SizedBox(
             height: 10,
@@ -717,26 +746,28 @@ class _homeScreenState extends State<homeScreen> {
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: nbcb,
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(10, 10),
-                      color: shadowD,
+                      offset: const Offset(10, 10),
+                      color: Theme.of(context).splashColor,
                     ),
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(-10, -10),
-                      color: shadowL,
+                      offset: const Offset(-10, -10),
+                      color: Theme.of(context).shadowColor,
                     ),
                   ]),
               child: Row(
                 children: [
                   Text(
                     authController.myUser.value.hAddress!,
-                    style: const TextStyle(
-                        color: grey, fontSize: 12, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColorDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -746,10 +777,12 @@ class _homeScreenState extends State<homeScreen> {
           const SizedBox(
             height: 20,
           ),
-          const Text(
+          Text(
             "Business Address",
             style: TextStyle(
-                color: grey, fontSize: 16, fontWeight: FontWeight.bold),
+                color: Theme.of(context).primaryColorDark,
+                fontSize: 16,
+                fontWeight: FontWeight.bold),
           ),
           const SizedBox(
             height: 10,
@@ -785,26 +818,28 @@ class _homeScreenState extends State<homeScreen> {
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: nbcb,
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(10, 10),
-                      color: shadowD,
+                      offset: const Offset(10, 10),
+                      color: Theme.of(context).splashColor,
                     ),
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(-10, -10),
-                      color: shadowL,
+                      offset: const Offset(-10, -10),
+                      color: Theme.of(context).shadowColor,
                     ),
                   ]),
               child: Row(
                 children: [
                   Text(
                     authController.myUser.value.bAddress!,
-                    style: const TextStyle(
-                        color: bc, fontSize: 12, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColorDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -851,27 +886,29 @@ class _homeScreenState extends State<homeScreen> {
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: nbcb,
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(10, 10),
-                      color: shadowD,
+                      offset: const Offset(10, 10),
+                      color: Theme.of(context).splashColor,
                     ),
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(-10, -10),
-                      color: shadowL,
+                      offset: const Offset(-10, -10),
+                      color: Theme.of(context).shadowColor,
                     ),
                   ]),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     "Search for Address",
                     style: TextStyle(
-                        color: bc, fontSize: 12, fontWeight: FontWeight.w600),
+                        color: Theme.of(context).primaryColorDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -913,27 +950,29 @@ class _homeScreenState extends State<homeScreen> {
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: nbcb,
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(10, 10),
-                      color: shadowD,
+                      offset: const Offset(10, 10),
+                      color: Theme.of(context).splashColor,
                     ),
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(-10, -10),
-                      color: shadowL,
+                      offset: const Offset(-10, -10),
+                      color: Theme.of(context).shadowColor,
                     ),
                   ]),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     "Current Location",
                     style: TextStyle(
-                        color: grey, fontSize: 12, fontWeight: FontWeight.w600),
+                        color: Theme.of(context).primaryColorDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -950,10 +989,10 @@ class _homeScreenState extends State<homeScreen> {
       width: Get.width,
       height: Get.height * 0.5,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-          color: nbcb),
+          color: Theme.of(context).primaryColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -1012,27 +1051,29 @@ class _homeScreenState extends State<homeScreen> {
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: nbcb,
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(10, 10),
-                      color: shadowD,
+                      offset: const Offset(10, 10),
+                      color: Theme.of(context).splashColor,
                     ),
                     BoxShadow(
                       blurRadius: 10,
-                      offset: Offset(-10, -10),
-                      color: shadowL,
+                      offset: const Offset(-10, -10),
+                      color: Theme.of(context).shadowColor,
                     ),
                   ]),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     "Search for Address",
                     style: TextStyle(
-                        color: grey, fontSize: 12, fontWeight: FontWeight.w600),
+                        color: Theme.of(context).primaryColorDark,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -1065,7 +1106,8 @@ class _homeScreenState extends State<homeScreen> {
               width: Get.width * 0.2,
               height: 8,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8), color: grey),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Theme.of(context).primaryColorDark),
             ),
           ),
           const SizedBox(
@@ -1130,7 +1172,7 @@ class _homeScreenState extends State<homeScreen> {
             value: dropdownValue,
             icon: const Icon(Icons.keyboard_arrow_down),
             elevation: 16,
-            style: const TextStyle(color: grey),
+            style: TextStyle(color: Theme.of(context).primaryColorDark),
             underline: Container(),
             onChanged: (String? value) {
               // This is called when the user selects an item.
@@ -1166,7 +1208,7 @@ buildDriversList() {
                 selectedRide = i;
               });
             },
-            child: buildDriverCard(selectedRide == i),
+            child: buildDriverCard(selectedRide == i, context),
           );
         },
         itemCount: 3,
@@ -1176,7 +1218,7 @@ buildDriversList() {
   );
 }
 
-buildDriverCard(bool selected) {
+buildDriverCard(bool selected, BuildContext context) {
   return Container(
     margin: const EdgeInsets.only(right: 8, left: 8, top: 4, bottom: 4),
     height: 105,
@@ -1184,13 +1226,14 @@ buildDriverCard(bool selected) {
     decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-              color: selected ? selectyellow : grey,
+              color:
+                  selected ? selectyellow : Theme.of(context).primaryColorDark,
               offset: const Offset(0, 5),
               blurRadius: 5,
               spreadRadius: 1)
         ],
         borderRadius: BorderRadius.circular(12),
-        color: selected ? yellow : grey),
+        color: selected ? yellow : Theme.of(context).primaryColorDark),
     child: Stack(
       children: [
         Container(
@@ -1221,7 +1264,7 @@ buildDriverCard(bool selected) {
   );
 }
 
-buildDrawerItem(
+buildDrawerItem(BuildContext context,
     {required String title,
     required Function onPressed,
     Color color = grey,
@@ -1241,7 +1284,9 @@ buildDrawerItem(
           Text(
             title,
             style: GoogleFonts.poppins(
-                fontSize: fontSize, fontWeight: fontWeight, color: grey),
+                fontSize: fontSize,
+                fontWeight: fontWeight,
+                color: Theme.of(context).primaryColorDark),
           ),
           const SizedBox(
             width: 5,
@@ -1265,9 +1310,9 @@ buildDrawerItem(
 }
 
 AuthController authController = Get.find<AuthController>();
-buildDrawer() {
+buildDrawer(BuildContext context) {
   return Drawer(
-    backgroundColor: nbcb,
+    backgroundColor: Theme.of(context).primaryColor,
     child: Column(
       children: [
         InkWell(
@@ -1306,7 +1351,8 @@ buildDrawer() {
                     children: [
                       Text('Good Morning, ',
                           style: GoogleFonts.poppins(
-                              color: White.withOpacity(0.28), fontSize: 14)),
+                              color: Theme.of(context).primaryColorDark,
+                              fontSize: 14)),
                       Text(
                         // 'Shibulyee ',
                         authController.myUser.value.name == null
@@ -1333,68 +1379,65 @@ buildDrawer() {
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
-              buildDrawerItem(
-                  title: 'Payment History',
-                  onPressed: () {
-                    Get.to(PaymentScreen());
-                  }),
-              buildDrawerItem(
+              buildDrawerItem(context, title: 'Payment History', onPressed: () {
+                Get.to(PaymentScreen());
+              }),
+              buildDrawerItem(context,
                   title: 'Ride History', onPressed: () {}, isVisible: true),
-              buildDrawerItem(title: 'Save a Location', onPressed: () {}),
-              buildDrawerItem(title: 'Promo Codes', onPressed: () {}),
-              buildDrawerItem(
-                  title: 'Settings',
-                  onPressed: () {
-                    Get.to(const SettingsScreen());
-                  }),
-              buildDrawerItem(title: 'Support', onPressed: () {}),
-              buildDrawerItem(
-                  title: 'Log Out',
-                  onPressed: () {
-                    FirebaseAuth.instance.signOut();
-                    Get.to(DecisionScreen());
-                  }),
+              buildDrawerItem(context,
+                  title: 'Save a Location', onPressed: () {}),
+              buildDrawerItem(context, title: 'Promo Codes', onPressed: () {}),
+              buildDrawerItem(context, title: 'Settings', onPressed: () {
+                Get.to(const SettingsScreen());
+              }),
+              buildDrawerItem(context, title: 'Support', onPressed: () {}),
+              buildDrawerItem(context, title: 'Log Out', onPressed: () {
+                FirebaseAuth.instance.signOut();
+                Get.to(DecisionScreen());
+              }),
+              const ChangeThemeButton(),
             ],
           ),
         ),
         const Spacer(),
-        const Divider(
-          color: grey,
+        Divider(
+          color: Theme.of(context).primaryColorDark,
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
           child: Column(
             children: [
-              buildDrawerItem(
+              buildDrawerItem(context,
                   title: 'Do more',
                   onPressed: () {},
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: bc.withOpacity(0.15),
+                  color: Theme.of(context).primaryColorDark.withOpacity(0.15),
                   height: 20),
               const SizedBox(
                 height: 20,
               ),
-              buildDrawerItem(
+              buildDrawerItem(context,
                   title: 'Get food delivery',
                   onPressed: () {},
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: bc.withOpacity(0.15),
+                  color: Theme.of(context).primaryColorDark.withOpacity(0.15),
                   height: 20),
-              buildDrawerItem(
+              buildDrawerItem(context,
                   title: 'Make money driving',
                   onPressed: () {},
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: bc.withOpacity(0.15),
+                  color: Theme.of(context).primaryColorDark.withOpacity(0.15),
                   height: 20),
               buildDrawerItem(
+                context,
                 title: 'Rate us on store',
                 onPressed: () {},
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: bc.withOpacity(0.15),
+                color: Theme.of(context).primaryColorDark.withOpacity(0.15),
                 height: 20,
               ),
             ],

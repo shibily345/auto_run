@@ -1,7 +1,4 @@
-import 'package:auto_run/core/const.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 import '../controller/auth_controller.dart';
@@ -18,11 +15,11 @@ class profpic extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeumorphicFloatingActionButton(
       style: NeumorphicStyle(
-        shadowDarkColor: bc,
-        shadowLightColor: Colors.grey,
-        color: NeumorphicColors.darkBackground,
+        shadowDarkColor: Theme.of(context).splashColor,
+        shadowLightColor: Theme.of(context).shadowColor,
+        color: Theme.of(context).primaryColor,
         shape: NeumorphicShape.convex,
-        boxShape: NeumorphicBoxShape.circle(),
+        boxShape: const NeumorphicBoxShape.circle(),
       ),
       child: Container(
         width: 50,
@@ -30,7 +27,7 @@ class profpic extends StatelessWidget {
         decoration: BoxDecoration(
             shape: BoxShape.circle,
             image: authController.myUser.value.image == null
-                ? DecorationImage(
+                ? const DecorationImage(
                     image: AssetImage('assets/person.png'), fit: BoxFit.cover)
                 : DecorationImage(
                     image: NetworkImage(authController.myUser.value.image!),
@@ -53,42 +50,24 @@ class drawerBar extends StatelessWidget {
     return Positioned(
       right: 20,
       top: 50,
-      child: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(blurRadius: 8, color: NeumorphicColors.darkBackground)
-          ],
-          border: Border.all(width: 4, color: NeumorphicColors.darkBackground),
-          shape: BoxShape.circle,
-        ),
-        child: Builder(builder: (context) {
-          return NeumorphicFloatingActionButton(
-            style: NeumorphicStyle(
-              shadowDarkColor: bc,
-              shadowLightColor: Colors.grey,
-              color: NeumorphicColors.darkBackground,
-              shape: NeumorphicShape.convex,
-              boxShape: NeumorphicBoxShape.circle(),
-            ),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-            child: Icon(
-              EvaIcons.menu2Outline,
-              color: yellow,
-            ),
-          );
-          // IconButton(
-          //   onPressed: () {
-          //     Scaffold.of(context).openDrawer();
-          //   },
-          //   icon: const Icon(EvaIcons.menu2Outline),
-          //   color: yellow,
-          // );
-        }),
-      ),
+      child: Builder(builder: (context) {
+        return NeumorphicFloatingActionButton(
+          style: NeumorphicStyle(
+            shadowDarkColor: Theme.of(context).shadowColor,
+            shadowLightColor: Theme.of(context).primaryColor,
+            color: Theme.of(context).primaryColor,
+            shape: NeumorphicShape.convex,
+            boxShape: const NeumorphicBoxShape.circle(),
+          ),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+          child: Icon(
+            color: Theme.of(context).indicatorColor,
+            EvaIcons.menu2Outline,
+          ),
+        );
+      }),
     );
   }
 }

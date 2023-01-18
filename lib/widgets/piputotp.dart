@@ -1,7 +1,6 @@
 import 'package:auto_run/controller/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinput/pinput.dart';
 
@@ -32,20 +31,20 @@ class _RoundedWithShadowState extends State<RoundedWithShadow> {
       width: 60,
       height: 64,
       textStyle: GoogleFonts.poppins(
-          fontSize: 20, color: Color.fromARGB(255, 255, 162, 0)),
+          fontSize: 20, color: Theme.of(context).indicatorColor),
       decoration: BoxDecoration(
-          color: Color.fromARGB(255, 78, 76, 76),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: const [
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
             BoxShadow(
-              blurRadius: 30,
-              offset: Offset(10, 10),
-              color: Color.fromARGB(41, 0, 0, 0),
+              blurRadius: 10,
+              offset: const Offset(10, 10),
+              color: Theme.of(context).splashColor,
             ),
             BoxShadow(
-              blurRadius: 20,
-              offset: Offset(-10, -10),
-              color: Color.fromARGB(41, 246, 241, 241),
+              blurRadius: 10,
+              offset: const Offset(-10, -10),
+              color: Theme.of(context).shadowColor,
             ),
           ]),
     );

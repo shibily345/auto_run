@@ -1,10 +1,12 @@
+import 'package:auto_run/core/theam_provider.dart';
 import 'package:auto_run/firebase_options.dart';
-import 'package:auto_run/pages/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 import 'controller/auth_controller.dart';
+import 'core/const.dart';
 import 'decision_screen/decission_screen.dart';
 
 void main() async {
@@ -24,12 +26,18 @@ class MyApp extends StatelessWidget {
     AuthController authcontroller = Get.put(AuthController());
     authcontroller.decideRoute();
     final textTheam = Theme.of(context).textTheme;
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.amber,
-      ),
-      home: DecisionScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      builder: (context, _) {
+        final themeProvider = Provider.of<ThemeProvider>(context);
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          themeMode: themeProvider.themeMode,
+          darkTheme: MyThemes.darkTheme,
+          theme: MyThemes.lightTheme,
+          home: DecisionScreen(),
+        );
+      },
     );
   }
 }

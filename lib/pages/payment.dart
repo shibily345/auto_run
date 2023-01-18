@@ -44,8 +44,9 @@ class PaymentScreenState extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       resizeToAvoidBottomInset: false,
-      body: Container(
+      body: SizedBox(
         width: Get.width,
         height: Get.height,
         child: Stack(
@@ -123,18 +124,18 @@ class PaymentScreenState extends State<PaymentScreen> {
                           fontWeight: FontWeight.bold,
                           color: yellow),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     FloatingActionButton(
                       onPressed: () {
                         Get.to(() => AddPaymentCardScreen());
                       },
+                      backgroundColor: yellow,
                       child: Icon(
                         Icons.arrow_forward,
-                        color: Colors.white,
+                        color: Theme.of(context).primaryColor,
                       ),
-                      backgroundColor: yellow,
                     )
                   ],
                 ))

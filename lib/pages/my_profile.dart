@@ -87,20 +87,20 @@ class _MyProfileState extends State<MyProfile> {
                                               .myUser.value.image!),
                                           fit: BoxFit.fill),
                                       shape: BoxShape.circle,
-                                      color: const Color(0xffD6D6D6)),
+                                      color: Theme.of(context).primaryColor),
                                 )
                               : Container(
                                   width: 120,
                                   height: 120,
                                   margin: const EdgeInsets.only(bottom: 20),
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Color(0xffD6D6D6)),
-                                  child: const Center(
+                                      color: Theme.of(context).primaryColor),
+                                  child: Center(
                                     child: Icon(
                                       Icons.camera_alt_outlined,
                                       size: 40,
-                                      color: Colors.white,
+                                      color: Theme.of(context).indicatorColor,
                                     ),
                                   ),
                                 )
@@ -113,7 +113,7 @@ class _MyProfileState extends State<MyProfile> {
                                       image: FileImage(selectedImage!),
                                       fit: BoxFit.fill),
                                   shape: BoxShape.circle,
-                                  color: const Color(0xffD6D6D6)),
+                                  color: Theme.of(context).primaryColor),
                             ),
                     ),
                   ),
@@ -259,7 +259,7 @@ class _MyProfileState extends State<MyProfile> {
           style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: const Color(0xffA7A7A7)),
+              color: Theme.of(context).primaryColorDark),
         ),
         const SizedBox(
           height: 6,
@@ -271,7 +271,7 @@ class _MyProfileState extends State<MyProfile> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Theme.of(context).primaryColor,
                     spreadRadius: 1,
                     blurRadius: 1)
               ],
@@ -284,7 +284,7 @@ class _MyProfileState extends State<MyProfile> {
             style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xffA7A7A7)),
+                color: Theme.of(context).primaryColorDark),
             decoration: InputDecoration(
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 10),
@@ -311,7 +311,9 @@ class _MyProfileState extends State<MyProfile> {
       child: Text(
         title,
         style: GoogleFonts.poppins(
-            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColorDark),
       ),
     );
   }

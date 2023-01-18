@@ -1,8 +1,7 @@
-import 'package:auto_run/core/const.dart';
 import 'package:flutter/material.dart';
 
-Widget DecisionButton(
-    String icon, String text, Function onPressed, double width,
+Widget DecisionButton(BuildContext context, IconData icon, String text,
+    Function onPressed, double width,
     {double height = 50}) {
   return InkWell(
     onTap: () => onPressed(),
@@ -10,14 +9,19 @@ Widget DecisionButton(
       width: width,
       height: height,
       decoration: BoxDecoration(
-          color: Colors.grey,
+          color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                spreadRadius: 3,
-                blurStyle: BlurStyle.outer)
+              blurRadius: 10,
+              offset: const Offset(10, 10),
+              color: Theme.of(context).splashColor,
+            ),
+            BoxShadow(
+              blurRadius: 10,
+              offset: const Offset(-10, -10),
+              color: Theme.of(context).shadowColor,
+            ),
           ]),
       child: Row(
         children: [
@@ -25,21 +29,30 @@ Widget DecisionButton(
             width: 65,
             height: height,
             decoration: BoxDecoration(
-              color: yellow,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
-            ),
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(10, 10),
+                    color: Theme.of(context).splashColor,
+                  ),
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(-10, -10),
+                    color: Theme.of(context).shadowColor,
+                  ),
+                ]),
             child: Center(
-              child: Image.asset(
+              child: Icon(
                 icon,
-                width: 30,
               ),
             ),
           ),
           Expanded(
               child: Text(
             text,
-            style: TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.black),
             textAlign: TextAlign.center,
           )),
         ],
