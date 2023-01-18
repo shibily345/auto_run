@@ -19,10 +19,8 @@ import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:geocoding/geocoding.dart' as geoCoding;
 import 'package:location/location.dart' as locationo;
 import 'package:location/location.dart';
-import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../core/theam_provider.dart';
 import '../widgets/slide_up.dart';
 import '../widgets/text_widget.dart';
 import '../widgets/theme_change_button.dart';
@@ -71,9 +69,9 @@ class _homeScreenState extends State<homeScreen> {
 
     authController.getUserInfo();
 
-    rootBundle.loadString('assets/map_style.txt').then((String) {
-      _mapStyle = String;
-    });
+    // rootBundle.loadString('assets/map_style.txt').then((String) {
+    //   _mapStyle = String;
+    // });
     rootBundle.loadString('assets/map_style_light.txt').then((String) {
       _mapStyleLight = String;
     });
@@ -87,10 +85,10 @@ class _homeScreenState extends State<homeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mapStyle =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-            ? _mapStyle
-            : _mapStyleLight;
+    // final mapStyle =
+    //     Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+    //         ? _mapStyle
+    //         : _mapStyleLight;
     return Scaffold(
       drawer: buildDrawer(context),
       body: SlidingUpPanel(
@@ -123,7 +121,7 @@ class _homeScreenState extends State<homeScreen> {
                       onMapCreated: (GoogleMapController controller) {
                         myMapController = controller;
                         setState(() {
-                          myMapController!.setMapStyle(mapStyle);
+                          myMapController!.setMapStyle(_mapStyleLight);
                         });
                       },
                       initialCameraPosition: CameraPosition(
@@ -593,9 +591,9 @@ class _homeScreenState extends State<homeScreen> {
           decoration: InputDecoration(
             hintText: 'From',
             hintStyle: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColorDark),
             suffixIcon: const Padding(
               padding: EdgeInsets.only(left: 10),
               child: Icon(
@@ -683,171 +681,18 @@ class _homeScreenState extends State<homeScreen> {
   void buildSourceSheet() {
     Get.bottomSheet(Container(
       width: Get.width,
-      height: Get.height * 0.5,
+      height: Get.height * 0.4,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-          color: Theme.of(context).primaryColorDark),
+          color: Theme.of(context).primaryColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const SizedBox(
             height: 10,
-          ),
-          Text(
-            "Select Your Location",
-            style: TextStyle(
-                color: Theme.of(context).primaryColorDark,
-                fontSize: 20,
-                fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Text(
-            "Home Address",
-            style: TextStyle(
-                color: Theme.of(context).primaryColorDark,
-                fontSize: 16,
-                fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          InkWell(
-            onTap: () async {
-              Get.back();
-              source = authController.myUser.value.homeAddress!;
-              sourceController.text = authController.myUser.value.hAddress!;
-
-              if (markers.length >= 2) {
-                markers.remove(markers.last);
-              }
-              markers.add(Marker(
-                  markerId: MarkerId(authController.myUser.value.hAddress!),
-                  infoWindow: InfoWindow(
-                    title: 'Source: ${authController.myUser.value.hAddress!}',
-                  ),
-                  position: source));
-
-              await getPolylines(source, destination);
-
-              // drawPolyline(place);
-
-              myMapController!.animateCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(target: source, zoom: 14)));
-              setState(() {});
-              buildRideConfirmationSheet();
-            },
-            child: Container(
-              width: Get.width,
-              height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      offset: const Offset(10, 10),
-                      color: Theme.of(context).splashColor,
-                    ),
-                    BoxShadow(
-                      blurRadius: 10,
-                      offset: const Offset(-10, -10),
-                      color: Theme.of(context).shadowColor,
-                    ),
-                  ]),
-              child: Row(
-                children: [
-                  Text(
-                    authController.myUser.value.hAddress!,
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColorDark,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Text(
-            "Business Address",
-            style: TextStyle(
-                color: Theme.of(context).primaryColorDark,
-                fontSize: 16,
-                fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          InkWell(
-            onTap: () async {
-              Get.back();
-              source = authController.myUser.value.bussinessAddres!;
-              sourceController.text = authController.myUser.value.bAddress!;
-
-              if (markers.length >= 2) {
-                markers.remove(markers.last);
-              }
-              markers.add(Marker(
-                  markerId: MarkerId(authController.myUser.value.bAddress!),
-                  infoWindow: InfoWindow(
-                    title: 'Source: ${authController.myUser.value.bAddress!}',
-                  ),
-                  position: source));
-
-              await getPolylines(source, destination);
-
-              // drawPolyline(place);
-
-              myMapController!.animateCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(target: source, zoom: 14)));
-              setState(() {});
-
-              // buildRideConfirmationSheet();
-            },
-            child: Container(
-              width: Get.width,
-              height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      offset: const Offset(10, 10),
-                      color: Theme.of(context).splashColor,
-                    ),
-                    BoxShadow(
-                      blurRadius: 10,
-                      offset: const Offset(-10, -10),
-                      color: Theme.of(context).shadowColor,
-                    ),
-                  ]),
-              child: Row(
-                children: [
-                  Text(
-                    authController.myUser.value.bAddress!,
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColorDark,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
           ),
           bigspace,
           InkWell(
@@ -1090,9 +935,9 @@ class _homeScreenState extends State<homeScreen> {
       width: Get.width,
       height: Get.height * 0.4,
       padding: const EdgeInsets.only(left: 20),
-      decoration: const BoxDecoration(
-        color: White,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        borderRadius: const BorderRadius.only(
             topRight: Radius.circular(12), topLeft: Radius.circular(12)),
       ),
       child: Column(
@@ -1101,19 +946,11 @@ class _homeScreenState extends State<homeScreen> {
           const SizedBox(
             height: 10,
           ),
-          Center(
-            child: Container(
-              width: Get.width * 0.2,
-              height: 8,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Theme.of(context).primaryColorDark),
-            ),
-          ),
           const SizedBox(
             height: 20,
           ),
           textWidget(
+              color: Theme.of(context).primaryColorDark,
               text: 'Select an option:',
               fontSize: 18,
               fontWeight: FontWeight.bold),
@@ -1183,7 +1020,8 @@ class _homeScreenState extends State<homeScreen> {
             items: list.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
-                child: textWidget(text: value),
+                child: textWidget(
+                    text: value, color: Theme.of(context).primaryColorDark),
               );
             }).toList(),
           )
@@ -1197,7 +1035,7 @@ int selectedRide = 0;
 
 buildDriversList() {
   return SizedBox(
-    height: 90,
+    height: 110,
     width: Get.width,
     child: StatefulBuilder(builder: (context, set) {
       return ListView.builder(
@@ -1224,14 +1062,6 @@ buildDriverCard(bool selected, BuildContext context) {
     height: 105,
     width: 135,
     decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-              color:
-                  selected ? selectyellow : Theme.of(context).primaryColorDark,
-              offset: const Offset(0, 5),
-              blurRadius: 5,
-              spreadRadius: 1)
-        ],
         borderRadius: BorderRadius.circular(12),
         color: selected ? yellow : Theme.of(context).primaryColorDark),
     child: Stack(

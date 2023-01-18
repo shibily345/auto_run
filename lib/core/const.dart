@@ -30,6 +30,7 @@ class MyThemes {
   static final darkTheme = ThemeData(
     primaryColorDark: Colors.grey,
     primaryColor: nbcb,
+    primarySwatch: yellow,
     indicatorColor: Colors.amber,
     splashColor: const Color.fromARGB(79, 0, 0, 0),
     shadowColor: const Color.fromARGB(32, 131, 128, 128),
