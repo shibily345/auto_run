@@ -25,6 +25,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: nbcb,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -43,7 +44,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       height: 45,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 42, 42, 42),
                       ),
                       child: Icon(
                         Icons.arrow_back,

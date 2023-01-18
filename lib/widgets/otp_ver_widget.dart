@@ -5,6 +5,7 @@ import 'package:auto_run/widgets/textwidgetsmall.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,9 +15,10 @@ Widget otpWidget() {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        textWidget(text: 'Phone Verification'),
+        textWidget(text: 'Phone Verification', color1: grey),
         textWidget(
           text: "Enter Your One Time Password\n(OTP)",
+          color1: grey,
         ),
         const SizedBox(
           height: 40,
@@ -27,18 +29,30 @@ Widget otpWidget() {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: RichText(
-            textAlign: TextAlign.start,
-            text: TextSpan(
-                style: GoogleFonts.poppins(color: Colors.black, fontSize: 12),
-                children: [
-                  TextSpan(
-                    text: 'If You Dont Have A code (OTP) ',
-                  ),
-                  TextSpan(
-                      text: "10 seconds",
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-                ]),
+          child: Row(
+            children: [
+              RichText(
+                textAlign: TextAlign.start,
+                text: TextSpan(
+                    style:
+                        GoogleFonts.poppins(color: Colors.black, fontSize: 12),
+                    children: [
+                      TextSpan(
+                        style: TextStyle(color: grey),
+                        text: 'If You Dont Have A code (OTP) ',
+                      ),
+                      TextSpan(
+                          text: "10 seconds",
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold, color: yellow)),
+                    ]),
+              ),
+              // NeumorphicFloatingActionButton(
+              //     child: Text('Go'),
+              //     onPressed: () {
+              //       Get.to();
+              //     })
+            ],
           ),
         )
       ],

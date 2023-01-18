@@ -88,9 +88,10 @@ class AuthController extends GetxController {
     log("LogedIn");
 
     await FirebaseAuth.instance.signInWithCredential(credential).then((value) {
+      Get.to(homeScreen());
       decideRoute();
     }).catchError((e) {
-      print("Error while sign In $e");
+      log("Error while sign In $e");
     });
   }
 
@@ -101,7 +102,7 @@ class AuthController extends GetxController {
       return;
     }
     isDecided = true;
-    print("called");
+    log("called");
 
     User? user = FirebaseAuth.instance.currentUser;
 

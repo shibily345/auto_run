@@ -18,14 +18,14 @@ Widget greenIntroWidget() {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 200),
-          child: Container(
+          child: SizedBox(
             height: 80,
             child: SvgPicture.asset(
               'assets/llogo.svg',
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         SvgPicture.asset('assets/biglog.svg'),
@@ -41,7 +41,7 @@ Widget greenIntroWidgetWithoutLogos(
     decoration: const BoxDecoration(
         image: DecorationImage(
             image: AssetImage('assets/bg2.png'), fit: BoxFit.fill)),
-    height: Get.height * 0.34,
+    height: Get.height * 0.32,
     child: Container(
         height: Get.height * 0.1,
         width: Get.width,
@@ -56,7 +56,7 @@ Widget greenIntroWidgetWithoutLogos(
                   letterSpacing: 1,
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 0, 0, 0)),
+                  color: const Color.fromARGB(255, 0, 0, 0)),
             ),
             if (subtitle != null)
               Text(
@@ -64,7 +64,7 @@ Widget greenIntroWidgetWithoutLogos(
                 style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Color.fromARGB(255, 0, 0, 0)),
+                    color: const Color.fromARGB(255, 0, 0, 0)),
               ),
           ],
         )),

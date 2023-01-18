@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 const bigspace = SizedBox(
@@ -21,3 +19,9 @@ const NeumorphicStyle nmstylebtn = NeumorphicStyle(
   shape: NeumorphicShape.convex,
   boxShape: NeumorphicBoxShape.circle(),
 );
+const nbcb = NeumorphicColors.darkBackground;
+const grey = Colors.grey;
+const shadowD = Color.fromARGB(79, 0, 0, 0);
+const shadowL = Color.fromARGB(32, 131, 128, 128);
+const selectyellow = Color.fromARGB(69, 255, 193, 7);
+

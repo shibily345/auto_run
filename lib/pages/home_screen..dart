@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
-import 'dart:ui';
+import 'package:auto_run/decision_screen/decission_screen.dart';
 import 'package:auto_run/pages/settings.dart';
-import 'package:auto_run/widgets/destination_sheet.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:auto_run/controller/auth_controller.dart';
@@ -10,21 +9,13 @@ import 'package:auto_run/core/const.dart';
 import 'package:auto_run/model/userModel.dart';
 import 'package:auto_run/pages/payment.dart';
 import 'package:auto_run/pages/profile_setting.dart';
-import 'package:blur_container/blur_container.dart';
-import 'package:blurrycontainer/blurrycontainer.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
-import 'package:google_maps_webservice/places.dart';
 import 'package:geocoding/geocoding.dart' as geoCoding;
 import 'package:location/location.dart' as locationo;
 import 'package:location/location.dart';
@@ -35,7 +26,7 @@ import '../widgets/text_widget.dart';
 import 'my_profile.dart';
 
 class homeScreen extends StatefulWidget {
-  homeScreen({super.key});
+  const homeScreen({super.key});
 
   @override
   State<homeScreen> createState() => _homeScreenState();
@@ -50,7 +41,7 @@ class _homeScreenState extends State<homeScreen> {
   late LatLng myLocation;
   late LatLng source;
   final Set<Polyline> _polyline = {};
-  Set<Marker> markers = Set<Marker>();
+  Set<Marker> markers = <Marker>{};
   List<String> list = <String>[
     '**** **** **** 8789',
     '**** **** **** 8921',
@@ -65,6 +56,8 @@ class _homeScreenState extends State<homeScreen> {
       setState(() {});
     });
   }
+
+  final bool _isElevated = false;
 
   @override
   void initState() {
@@ -88,12 +81,9 @@ class _homeScreenState extends State<homeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {},
-      // ),
       drawer: buildDrawer(),
       body: SlidingUpPanel(
-        color: NeumorphicColors.darkBackground,
+        color: nbcb,
         controller: panalController,
         minHeight: Get.height * 0.4,
         maxHeight: Get.height * 0.8,
@@ -103,7 +93,7 @@ class _homeScreenState extends State<homeScreen> {
         ),
         parallaxEnabled: true,
         parallaxOffset: .5,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         body: Stack(
           children: [
             Positioned(
@@ -112,7 +102,7 @@ class _homeScreenState extends State<homeScreen> {
               right: 0,
               bottom: 0,
               child: currentLocation == null
-                  ? Center(
+                  ? const Center(
                       child: CircularProgressIndicator(),
                     )
                   : GoogleMap(
@@ -131,14 +121,7 @@ class _homeScreenState extends State<homeScreen> {
                       ),
                     ),
             ),
-            // Padding(
-            //   padding: const EdgeInsets.only(top: 50.0, left: 20),
-            //   child: profpic(authController: authController),
-            // ),
             drawerBar(authController: authController),
-
-            // buildNotificationIcon(),
-            buildBottomSheet(),
           ],
         ),
       ),
@@ -160,14 +143,179 @@ class _homeScreenState extends State<homeScreen> {
         bigspace,
         Row(
           children: [
-            showSourceField
-                ? buildTextFieldFrom()
-                : Container(
-                    padding: EdgeInsets.symmetric(horizontal: 26),
-                    height: 106,
-                    width: Get.width,
-                    child: buildDriversList(),
-                  ),
+            if (showSourceField)
+              buildTextFieldFrom()
+            else
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 26),
+                height: 106,
+                width: Get.width,
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        authController.myUser.value.homeAddress! == null
+                            ? const Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : Get.back();
+                        destination = authController.myUser.value.homeAddress!;
+                        destinationController.text =
+                            authController.myUser.value.hAddress!;
+
+                        if (markers.length >= 2) {
+                          markers.remove(markers.last);
+                        }
+                        markers.add(Marker(
+                          markerId:
+                              MarkerId(authController.myUser.value.hAddress!),
+                          infoWindow: InfoWindow(
+                            title:
+                                'Destination: ${authController.myUser.value.hAddress!}',
+                          ),
+                          position: destination,
+                          icon: BitmapDescriptor.fromBytes(markIcons),
+                        ));
+
+                        myMapController!.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                                CameraPosition(target: destination, zoom: 14)));
+                        setState(() {
+                          showSourceField = true;
+                        });
+                      },
+                      child: Container(
+                        width: Get.width * 0.38,
+                        height: 100,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            color: nbcb,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: const [
+                              BoxShadow(
+                                blurRadius: 10,
+                                offset: Offset(10, 10),
+                                color: shadowD,
+                              ),
+                              BoxShadow(
+                                blurRadius: 10,
+                                offset: Offset(-10, -10),
+                                color: shadowL,
+                              ),
+                            ]),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.house_rounded,
+                              color: yellow,
+                              size: 65,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    authController.myUser.value.hAddress!,
+                                    style: const TextStyle(
+                                        color: grey,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600),
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 40,
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        authController.myUser.value.bussinessAddres == null
+                            ? Get.dialog(textWidget(text: 'Add A adress'))
+                            : destinationController.text =
+                                authController.myUser.value.bAddress!;
+                        destination =
+                            authController.myUser.value.bussinessAddres!;
+                        if (markers.length >= 2) {
+                          markers.remove(markers.last);
+                        }
+                        markers.add(Marker(
+                          markerId:
+                              MarkerId(authController.myUser.value.bAddress!),
+                          infoWindow: InfoWindow(
+                            title:
+                                'Destination: ${authController.myUser.value.bAddress!}',
+                          ),
+                          position: destination,
+                          icon: BitmapDescriptor.fromBytes(markIcons),
+                        ));
+
+                        myMapController!.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                                CameraPosition(target: destination, zoom: 14)));
+                        setState(() {});
+                        Get.back();
+                      },
+                      child: Container(
+                        width: Get.width * 0.38,
+                        height: 100,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            color: nbcb,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: const [
+                              BoxShadow(
+                                blurRadius: 10,
+                                offset: Offset(10, 10),
+                                color: shadowD,
+                              ),
+                              BoxShadow(
+                                blurRadius: 10,
+                                offset: Offset(-10, -10),
+                                color: shadowL,
+                              ),
+                            ]),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.location_city_rounded,
+                              color: yellow,
+                              size: 65,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    authController.myUser.value.bAddress!,
+                                    style: const TextStyle(
+                                        color: grey,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600),
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             // Spacer(),
             // buildCurrentLocationIcon(),
           ],
@@ -184,7 +332,7 @@ class _homeScreenState extends State<homeScreen> {
           width: 50,
           height: 5,
           decoration: BoxDecoration(
-            color: ui.Color.fromARGB(255, 215, 214, 214),
+            color: grey,
             borderRadius: BorderRadius.circular(12),
           ),
         ),
@@ -201,34 +349,55 @@ class _homeScreenState extends State<homeScreen> {
       () => authController.myUser.value.name == null
           ? InkWell(
               onTap: () {
-                Get.to(ProfileSettingScreen());
+                Get.to(const ProfileSettingScreen());
               },
-              child: Container(
-                alignment: Alignment.topCenter,
-                height: 50,
-                width: 370,
-                decoration: BoxDecoration(
-                    color: ui.Color.fromARGB(255, 161, 159, 159),
-                    borderRadius: BorderRadius.circular(15)),
-                child: Text(
-                  'Add Profile',
-                  style: TextStyle(
-                      fontSize: 25, fontWeight: FontWeight.w800, color: bc),
-                ),
+              child: Column(
+                children: [
+                  Container(
+                    alignment: Alignment.topCenter,
+                    height: 30,
+                    width: Get.width * 0.6,
+                    decoration: BoxDecoration(
+                        color: nbcb,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: const [
+                          BoxShadow(
+                            blurRadius: 10,
+                            offset: Offset(10, 10),
+                            color: shadowD,
+                          ),
+                          BoxShadow(
+                            blurRadius: 10,
+                            offset: Offset(-10, -10),
+                            color: shadowL,
+                          ),
+                        ]),
+                    child: const Center(
+                      child: Text(
+                        'Set up Profile',
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: yellow),
+                      ),
+                    ),
+                  ),
+                  bigspace,
+                ],
               ),
             )
           : Container(
               width: Get.width,
               height: 70,
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 20,
               ),
-              decoration: BoxDecoration(color: NeumorphicColors.darkBackground),
+              decoration: const BoxDecoration(color: nbcb),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Column(
@@ -237,25 +406,23 @@ class _homeScreenState extends State<homeScreen> {
                     children: [
                       RichText(
                         text: TextSpan(children: [
-                          TextSpan(
+                          const TextSpan(
                               text: 'Good Morning, ',
-                              style: TextStyle(
-                                  color: ui.Color.fromARGB(255, 161, 160, 160),
-                                  fontSize: 14)),
+                              style: TextStyle(color: grey, fontSize: 14)),
                           TextSpan(
                               text: authController.myUser.value.name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: yellow,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold)),
                         ]),
                       ),
-                      Text(
+                      const Text(
                         "Where are you going?",
                         style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: ui.Color.fromARGB(255, 160, 158, 158)),
+                            color: grey),
                       )
                     ],
                   ),
@@ -276,22 +443,53 @@ class _homeScreenState extends State<homeScreen> {
       child: Container(
         width: Get.width,
         height: 50,
-        padding: EdgeInsets.only(left: 15),
+        padding: const EdgeInsets.only(left: 15),
         decoration: BoxDecoration(
-            color: ui.Color.fromARGB(255, 205, 201, 201),
-            boxShadow: [
+            color: nbcb,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: const [
               BoxShadow(
-                  color:
-                      ui.Color.fromARGB(255, 123, 123, 123).withOpacity(0.05),
-                  spreadRadius: 4,
-                  blurRadius: 10)
-            ],
-            borderRadius: BorderRadius.circular(8)),
+                blurRadius: 10,
+                offset: Offset(10, 10),
+                color: shadowD,
+              ),
+              BoxShadow(
+                blurRadius: 10,
+                offset: Offset(-10, -10),
+                color: shadowL,
+              ),
+            ]),
         child: TextFormField(
           controller: destinationController,
           readOnly: true,
           onTap: () async {
-            buildDestinationSheet();
+            Get.back();
+            Prediction? p = await showGoogleAutoComplete(context);
+
+            String selectedPlace = p!.description!;
+            destinationController.text = selectedPlace;
+            List<geoCoding.Location> locations =
+                await geoCoding.locationFromAddress(selectedPlace);
+
+            destination =
+                LatLng(locations.first.latitude, locations.first.longitude);
+
+            markers.add(Marker(
+              markerId: MarkerId(selectedPlace),
+              infoWindow: InfoWindow(
+                title: 'Destination: $selectedPlace',
+              ),
+              position: destination,
+              icon: BitmapDescriptor.fromBytes(markIcons),
+            ));
+
+            myMapController!.animateCamera(CameraUpdate.newCameraPosition(
+                CameraPosition(target: destination, zoom: 14)
+                //17 is new zoom level
+                ));
+            setState(() {
+              showSourceField = true;
+            });
           },
           style: GoogleFonts.poppins(
             fontSize: 16,
@@ -300,6 +498,7 @@ class _homeScreenState extends State<homeScreen> {
           decoration: InputDecoration(
             hintText: 'Search for a destination',
             hintStyle: GoogleFonts.poppins(
+              color: grey,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -340,16 +539,22 @@ class _homeScreenState extends State<homeScreen> {
       child: Container(
         width: Get.width * 0.6,
         height: 50,
-        padding: EdgeInsets.only(left: 15),
+        padding: const EdgeInsets.only(left: 15),
         decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
+            color: nbcb,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: const [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  spreadRadius: 4,
-                  blurRadius: 10)
-            ],
-            borderRadius: BorderRadius.circular(8)),
+                blurRadius: 10,
+                offset: Offset(10, 10),
+                color: shadowD,
+              ),
+              BoxShadow(
+                blurRadius: 10,
+                offset: Offset(-10, -10),
+                color: shadowL,
+              ),
+            ]),
         child: TextFormField(
           controller: sourceController,
           readOnly: true,
@@ -366,8 +571,8 @@ class _homeScreenState extends State<homeScreen> {
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
-            suffixIcon: Padding(
-              padding: const EdgeInsets.only(left: 10),
+            suffixIcon: const Padding(
+              padding: EdgeInsets.only(left: 10),
               child: Icon(
                 EvaIcons.search,
               ),
@@ -383,7 +588,7 @@ class _homeScreenState extends State<homeScreen> {
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
-        padding: EdgeInsets.only(right: 26),
+        padding: const EdgeInsets.only(right: 26),
         child: NeumorphicFloatingActionButton(
           style: nmStyle(),
           onPressed: () {
@@ -393,7 +598,7 @@ class _homeScreenState extends State<homeScreen> {
                         currentLocation!.longitude!),
                     zoom: 14)));
           },
-          child: Icon(
+          child: const Icon(
             Icons.my_location_outlined,
             color: yellow,
           ),
@@ -403,59 +608,12 @@ class _homeScreenState extends State<homeScreen> {
   }
 
   NeumorphicStyle nmStyle() {
-    return NeumorphicStyle(
+    return const NeumorphicStyle(
       shadowDarkColor: bc,
-      shadowLightColor: Colors.grey,
-      color: NeumorphicColors.darkBackground,
+      shadowLightColor: grey,
+      color: nbcb,
       shape: NeumorphicShape.convex,
       boxShape: NeumorphicBoxShape.circle(),
-    );
-  }
-
-  Widget buildNotificationIcon() {
-    return const Align(
-      alignment: Alignment.bottomLeft,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: 35, left: 8),
-        child: CircleAvatar(
-          radius: 20,
-          backgroundColor: Color.fromARGB(255, 194, 142, 0),
-          child: Icon(
-            EvaIcons.bellOutline,
-            color: Color.fromARGB(255, 255, 255, 255),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildBottomSheet() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: InkWell(
-        onTap: () {},
-        child: Container(
-          width: Get.width * 0.8,
-          height: 25,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    spreadRadius: 4,
-                    blurRadius: 10)
-              ],
-              borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(12), topLeft: Radius.circular(12))),
-          child: Center(
-            child: Container(
-              width: Get.width * 0.6,
-              height: 4,
-              color: Colors.black45,
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -469,15 +627,15 @@ class _homeScreenState extends State<homeScreen> {
       context: context,
       mode: Mode.overlay,
       apiKey: apikey,
-      components: [new Component(Component.country, "in")],
+      components: [Component(Component.country, "in")],
       types: [],
       hint: "Search City",
       decoration: InputDecoration(
         hintText: 'Search',
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(
-            color: Colors.white,
+          borderSide: const BorderSide(
+            color: White,
           ),
         ),
       ),
@@ -501,32 +659,32 @@ class _homeScreenState extends State<homeScreen> {
     Get.bottomSheet(Container(
       width: Get.width,
       height: Get.height * 0.5,
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: const BoxDecoration(
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-          color: Color.fromARGB(255, 208, 199, 176)),
+          color: grey),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Text(
+          const Text(
             "Select Your Location",
-            style: TextStyle(
-                color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            style:
+                TextStyle(color: bc, fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Text(
+          const Text(
             "Home Address",
-            style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+            style:
+                TextStyle(color: bc, fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           InkWell(
@@ -557,39 +715,43 @@ class _homeScreenState extends State<homeScreen> {
             child: Container(
               width: Get.width,
               height: 50,
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: nbcb,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        spreadRadius: 4,
-                        blurRadius: 10)
+                      blurRadius: 10,
+                      offset: Offset(10, 10),
+                      color: shadowD,
+                    ),
+                    BoxShadow(
+                      blurRadius: 10,
+                      offset: Offset(-10, -10),
+                      color: shadowL,
+                    ),
                   ]),
               child: Row(
                 children: [
                   Text(
                     authController.myUser.value.hAddress!,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        color: grey, fontSize: 12, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Text(
+          const Text(
             "Business Address",
             style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+                color: grey, fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           InkWell(
@@ -621,31 +783,35 @@ class _homeScreenState extends State<homeScreen> {
             child: Container(
               width: Get.width,
               height: 50,
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: nbcb,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        spreadRadius: 4,
-                        blurRadius: 10)
+                      blurRadius: 10,
+                      offset: Offset(10, 10),
+                      color: shadowD,
+                    ),
+                    BoxShadow(
+                      blurRadius: 10,
+                      offset: Offset(-10, -10),
+                      color: shadowL,
+                    ),
                   ]),
               child: Row(
                 children: [
                   Text(
                     authController.myUser.value.bAddress!,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        color: bc, fontSize: 12, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           bigspace,
@@ -683,25 +849,29 @@ class _homeScreenState extends State<homeScreen> {
             child: Container(
               width: Get.width,
               height: 50,
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: nbcb,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        spreadRadius: 4,
-                        blurRadius: 10)
+                      blurRadius: 10,
+                      offset: Offset(10, 10),
+                      color: shadowD,
+                    ),
+                    BoxShadow(
+                      blurRadius: 10,
+                      offset: Offset(-10, -10),
+                      color: shadowL,
+                    ),
                   ]),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Text(
                     "Search for Address",
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
+                        color: bc, fontSize: 12, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -741,15 +911,21 @@ class _homeScreenState extends State<homeScreen> {
             child: Container(
               width: Get.width,
               height: 50,
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: nbcb,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        spreadRadius: 4,
-                        blurRadius: 10)
+                      blurRadius: 10,
+                      offset: Offset(10, 10),
+                      color: shadowD,
+                    ),
+                    BoxShadow(
+                      blurRadius: 10,
+                      offset: Offset(-10, -10),
+                      color: shadowL,
+                    ),
                   ]),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -757,9 +933,7 @@ class _homeScreenState extends State<homeScreen> {
                   Text(
                     "Current Location",
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
+                        color: grey, fontSize: 12, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -775,157 +949,33 @@ class _homeScreenState extends State<homeScreen> {
     Get.bottomSheet(Container(
       width: Get.width,
       height: Get.height * 0.5,
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: const BoxDecoration(
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-          color: Color.fromARGB(255, 208, 199, 176)),
+          color: nbcb),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Text(
-            "Select Your Location",
-            style: TextStyle(
-                color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            "Home Address",
-            style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          InkWell(
-            onTap: () async {
-              Get.back();
-              destination = authController.myUser.value.homeAddress!;
-              destinationController.text =
-                  authController.myUser.value.hAddress!;
-
-              if (markers.length >= 2) {
-                markers.remove(markers.last);
-              }
-              markers.add(Marker(
-                  markerId: MarkerId(authController.myUser.value.hAddress!),
-                  infoWindow: InfoWindow(
-                    title:
-                        'destination: ${authController.myUser.value.hAddress!}',
-                  ),
-                  position: destination));
-
-              // await getPolylines(source, destination);
-
-              // drawPolyline(place);
-
-              myMapController!.animateCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(target: destination, zoom: 14)));
-              setState(() {});
-
-              // buildRideConfirmationSheet();
-            },
-            child: Container(
-              width: Get.width,
-              height: 50,
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        spreadRadius: 4,
-                        blurRadius: 10)
-                  ]),
-              child: Row(
-                children: [
-                  Text(
-                    authController.myUser.value.hAddress!,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
+          NeumorphicText(
+            "Select Your Destination",
+            textStyle: NeumorphicTextStyle(
+              fontSize: 20,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Text(
-            "Business Address",
-            style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
+          bigspace,
+          const SizedBox(
             height: 10,
           ),
-          InkWell(
-            onTap: () async {
-              Get.back();
-              destination = authController.myUser.value.bussinessAddres!;
-              destinationController.text =
-                  authController.myUser.value.bAddress!;
-
-              if (markers.length >= 2) {
-                markers.remove(markers.last);
-              }
-              markers.add(Marker(
-                  markerId: MarkerId(authController.myUser.value.bAddress!),
-                  infoWindow: InfoWindow(
-                    title:
-                        'destination: ${authController.myUser.value.bAddress!}',
-                  ),
-                  position: destination));
-
-              // await getPolylines(source, destination);
-
-              // drawPolyline(place);
-
-              myMapController!.animateCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(target: destination, zoom: 14)));
-              setState(() {});
-
-              // buildRideConfirmationSheet();
-            },
-            child: Container(
-              width: Get.width,
-              height: 50,
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        spreadRadius: 4,
-                        blurRadius: 10)
-                  ]),
-              child: Row(
-                children: [
-                  Text(
-                    authController.myUser.value.bAddress!,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 20,
+          const SizedBox(
+            height: 50,
           ),
           InkWell(
             onTap: () async {
@@ -960,25 +1010,29 @@ class _homeScreenState extends State<homeScreen> {
             child: Container(
               width: Get.width,
               height: 50,
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: nbcb,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        spreadRadius: 4,
-                        blurRadius: 10)
+                      blurRadius: 10,
+                      offset: Offset(10, 10),
+                      color: shadowD,
+                    ),
+                    BoxShadow(
+                      blurRadius: 10,
+                      offset: Offset(-10, -10),
+                      color: shadowL,
+                    ),
                   ]),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Text(
                     "Search for Address",
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
+                        color: grey, fontSize: 12, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -994,9 +1048,9 @@ class _homeScreenState extends State<homeScreen> {
     Get.bottomSheet(Container(
       width: Get.width,
       height: Get.height * 0.4,
-      padding: EdgeInsets.only(left: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
+      padding: const EdgeInsets.only(left: 20),
+      decoration: const BoxDecoration(
+        color: White,
         borderRadius: BorderRadius.only(
             topRight: Radius.circular(12), topLeft: Radius.circular(12)),
       ),
@@ -1011,7 +1065,7 @@ class _homeScreenState extends State<homeScreen> {
               width: Get.width * 0.2,
               height: 8,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8), color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8), color: grey),
             ),
           ),
           const SizedBox(
@@ -1028,8 +1082,8 @@ class _homeScreenState extends State<homeScreen> {
           const SizedBox(
             height: 20,
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
+          const Padding(
+            padding: EdgeInsets.only(right: 20),
             child: Divider(),
           ),
           bigspace,
@@ -1044,12 +1098,12 @@ class _homeScreenState extends State<homeScreen> {
                   onPressed: () {
                     Get.back();
                   },
+                  color: yellow,
+                  shape: const StadiumBorder(),
                   child: textWidget(
                     text: 'Confirm',
-                    color: Colors.white,
+                    color: White,
                   ),
-                  color: yellow,
-                  shape: StadiumBorder(),
                 )
               ],
             ),
@@ -1069,14 +1123,14 @@ class _homeScreenState extends State<homeScreen> {
             'assets/visa.png',
             width: 40,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           DropdownButton<String>(
             value: dropdownValue,
             icon: const Icon(Icons.keyboard_arrow_down),
             elevation: 16,
-            style: const TextStyle(color: Colors.deepPurple),
+            style: const TextStyle(color: grey),
             underline: Container(),
             onChanged: (String? value) {
               // This is called when the user selects an item.
@@ -1100,7 +1154,7 @@ class _homeScreenState extends State<homeScreen> {
 int selectedRide = 0;
 
 buildDriversList() {
-  return Container(
+  return SizedBox(
     height: 90,
     width: Get.width,
     child: StatefulBuilder(builder: (context, set) {
@@ -1124,39 +1178,34 @@ buildDriversList() {
 
 buildDriverCard(bool selected) {
   return Container(
-    margin: EdgeInsets.only(right: 8, left: 8, top: 4, bottom: 4),
+    margin: const EdgeInsets.only(right: 8, left: 8, top: 4, bottom: 4),
     height: 105,
     width: 135,
     decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-              color: selected
-                  ? Color.fromARGB(255, 255, 196, 0).withOpacity(0.2)
-                  : Colors.grey.withOpacity(0.2),
-              offset: Offset(0, 5),
+              color: selected ? selectyellow : grey,
+              offset: const Offset(0, 5),
               blurRadius: 5,
               spreadRadius: 1)
         ],
         borderRadius: BorderRadius.circular(12),
-        color: selected ? Color.fromARGB(255, 253, 208, 4) : Colors.grey),
+        color: selected ? yellow : grey),
     child: Stack(
       children: [
         Container(
-          padding: EdgeInsets.only(left: 10, top: 10, bottom: 10, right: 10),
+          padding:
+              const EdgeInsets.only(left: 10, top: 10, bottom: 10, right: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               textWidget(
-                  text: 'Standard',
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700),
+                  text: 'Standard', color: White, fontWeight: FontWeight.w700),
               textWidget(
-                  text: '₹ 9.90',
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500),
+                  text: '₹ 9.90', color: White, fontWeight: FontWeight.w500),
               textWidget(
                   text: '3 MIN',
-                  color: Colors.white.withOpacity(0.8),
+                  color: White.withOpacity(0.8),
                   fontWeight: FontWeight.normal,
                   fontSize: 12),
             ],
@@ -1175,7 +1224,7 @@ buildDriverCard(bool selected) {
 buildDrawerItem(
     {required String title,
     required Function onPressed,
-    Color color = Colors.grey,
+    Color color = grey,
     double fontSize = 20,
     FontWeight fontWeight = FontWeight.w700,
     double height = 45,
@@ -1183,7 +1232,7 @@ buildDrawerItem(
   return SizedBox(
     height: height,
     child: ListTile(
-      contentPadding: EdgeInsets.all(0),
+      contentPadding: const EdgeInsets.all(0),
       // minVerticalPadding: 0,
       dense: true,
       onTap: () => onPressed(),
@@ -1192,7 +1241,7 @@ buildDrawerItem(
           Text(
             title,
             style: GoogleFonts.poppins(
-                fontSize: fontSize, fontWeight: fontWeight, color: Colors.grey),
+                fontSize: fontSize, fontWeight: fontWeight, color: grey),
           ),
           const SizedBox(
             width: 5,
@@ -1204,7 +1253,7 @@ buildDrawerItem(
                   child: Text(
                     '1',
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: White,
                     ),
                   ),
                 )
@@ -1218,7 +1267,7 @@ buildDrawerItem(
 AuthController authController = Get.find<AuthController>();
 buildDrawer() {
   return Drawer(
-    backgroundColor: NeumorphicColors.darkBackground,
+    backgroundColor: nbcb,
     child: Column(
       children: [
         InkWell(
@@ -1257,9 +1306,7 @@ buildDrawer() {
                     children: [
                       Text('Good Morning, ',
                           style: GoogleFonts.poppins(
-                              color: ui.Color.fromARGB(255, 239, 233, 233)
-                                  .withOpacity(0.28),
-                              fontSize: 14)),
+                              color: White.withOpacity(0.28), fontSize: 14)),
                       Text(
                         // 'Shibulyee ',
                         authController.myUser.value.name == null
@@ -1283,7 +1330,7 @@ buildDrawer() {
           height: 20,
         ),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
               buildDrawerItem(
@@ -1298,23 +1345,24 @@ buildDrawer() {
               buildDrawerItem(
                   title: 'Settings',
                   onPressed: () {
-                    Get.to(SettingsScreen());
+                    Get.to(const SettingsScreen());
                   }),
               buildDrawerItem(title: 'Support', onPressed: () {}),
               buildDrawerItem(
                   title: 'Log Out',
                   onPressed: () {
                     FirebaseAuth.instance.signOut();
+                    Get.to(DecisionScreen());
                   }),
             ],
           ),
         ),
-        Spacer(),
-        Divider(
-          color: Colors.grey,
+        const Spacer(),
+        const Divider(
+          color: grey,
         ),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
           child: Column(
             children: [
               buildDrawerItem(
@@ -1322,7 +1370,7 @@ buildDrawer() {
                   onPressed: () {},
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black.withOpacity(0.15),
+                  color: bc.withOpacity(0.15),
                   height: 20),
               const SizedBox(
                 height: 20,
@@ -1332,21 +1380,21 @@ buildDrawer() {
                   onPressed: () {},
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black.withOpacity(0.15),
+                  color: bc.withOpacity(0.15),
                   height: 20),
               buildDrawerItem(
                   title: 'Make money driving',
                   onPressed: () {},
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black.withOpacity(0.15),
+                  color: bc.withOpacity(0.15),
                   height: 20),
               buildDrawerItem(
                 title: 'Rate us on store',
                 onPressed: () {},
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: Colors.black.withOpacity(0.15),
+                color: bc.withOpacity(0.15),
                 height: 20,
               ),
             ],

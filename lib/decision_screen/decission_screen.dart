@@ -17,6 +17,7 @@ class DecisionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: nbcb,
       body: Container(
         width: double.infinity,
         child: Column(
@@ -26,7 +27,8 @@ class DecisionScreen extends StatelessWidget {
             textWidget(
                 text: 'Welcome...!',
                 fontSize1: 30,
-                fontWeight1: FontWeight.w400),
+                fontWeight1: FontWeight.w400,
+                color1: Colors.grey),
             const SizedBox(
               height: 50,
             ),

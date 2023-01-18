@@ -34,9 +34,20 @@ class _RoundedWithShadowState extends State<RoundedWithShadow> {
       textStyle: GoogleFonts.poppins(
           fontSize: 20, color: Color.fromARGB(255, 255, 162, 0)),
       decoration: BoxDecoration(
-        color: Color.fromARGB(32, 102, 102, 103),
-        borderRadius: BorderRadius.circular(24),
-      ),
+          color: Color.fromARGB(255, 78, 76, 76),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: const [
+            BoxShadow(
+              blurRadius: 30,
+              offset: Offset(10, 10),
+              color: Color.fromARGB(41, 0, 0, 0),
+            ),
+            BoxShadow(
+              blurRadius: 20,
+              offset: Offset(-10, -10),
+              color: Color.fromARGB(41, 246, 241, 241),
+            ),
+          ]),
     );
 
     final cursor = Align(
@@ -63,16 +74,20 @@ class _RoundedWithShadowState extends State<RoundedWithShadow> {
       separator: const SizedBox(width: 16),
       focusedPinTheme: defaultPinTheme.copyWith(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: const [
-            BoxShadow(
-              color: Color.fromARGB(108, 0, 0, 0),
-              offset: Offset(0, 3),
-              blurRadius: 16,
-            )
-          ],
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: const [
+              BoxShadow(
+                blurRadius: 30,
+                offset: Offset(10, 10),
+                color: Color.fromARGB(41, 0, 0, 0),
+              ),
+              BoxShadow(
+                blurRadius: 20,
+                offset: Offset(-10, -10),
+                color: Color.fromARGB(41, 246, 241, 241),
+              ),
+            ]),
       ),
       showCursor: true,
       cursor: cursor,

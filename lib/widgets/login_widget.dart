@@ -18,9 +18,10 @@ Widget loginWidget(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          textWidget(text: 'Hello, Nice To Meet You'),
+          textWidget(text: 'Hello, Nice To Meet You', color1: yellow),
           textWidget(
             text: "Go With Riksaw 'Wherever Whenever'",
+            color1: grey,
             fontSize1: 20,
             fontWeight1: FontWeight.bold,
           ),
@@ -30,14 +31,18 @@ Widget loginWidget(
             width: double.infinity,
             height: 65,
             decoration: BoxDecoration(
-                color: White,
+                color: Color.fromARGB(255, 127, 127, 127),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
-                    blurRadius: 4,
-                    offset: Offset(0, 4),
+                    blurRadius: 30,
+                    offset: Offset(20, 20),
                     color: Color.fromARGB(41, 0, 0, 0),
-                    spreadRadius: 3,
+                  ),
+                  BoxShadow(
+                    blurRadius: 30,
+                    offset: Offset(-20, -20),
+                    color: Color.fromARGB(41, 246, 241, 241),
                   ),
                 ]),
             child: Row(
@@ -107,17 +112,23 @@ Widget loginWidget(
                     style: GoogleFonts.poppins(color: bc, fontSize: 12),
                     children: [
                       TextSpan(
-                          text:
-                              'By creating an account, you agree to our Privacy Policy\n'),
+                        style: TextStyle(color: grey),
+                        text:
+                            'By creating an account, you agree to our Privacy Policy\n',
+                      ),
                       TextSpan(
-                          text: ' Terms of Service ',
-                          style:
-                              GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-                      TextSpan(text: 'and '),
+                        text: ' Terms of Service ',
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold, color: grey),
+                      ),
+                      TextSpan(
+                        text: 'and ',
+                        style: TextStyle(color: grey),
+                      ),
                       TextSpan(
                           text: 'Privacy Policy',
-                          style:
-                              GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold, color: grey)),
                     ])),
           )
         ],

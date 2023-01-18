@@ -1,11 +1,6 @@
 import 'dart:io';
 
-import 'package:auto_run/controller/auth_controller.dart';
 import 'package:auto_run/core/const.dart';
-import 'package:auto_run/widgets/green_intro.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +8,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as Path;
+
+import '../controller/auth_controller.dart';
+import '../widgets/green_intro.dart';
 
 class MyProfile extends StatefulWidget {
   const MyProfile({Key? key}) : super(key: key);
@@ -44,7 +41,6 @@ class _MyProfileState extends State<MyProfile> {
   late LatLng homeAddress;
   late LatLng businessAddress;
   late LatLng shoppingAddress;
-
   @override
   void initState() {
     // TODO: implement initState
@@ -68,8 +64,8 @@ class _MyProfileState extends State<MyProfile> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: Get.height * 0.36,
+            SizedBox(
+              height: Get.height * 0.4,
               child: Stack(
                 children: [
                   greenIntroWidgetWithoutLogos(title: 'My Profile'),
@@ -84,23 +80,23 @@ class _MyProfileState extends State<MyProfile> {
                               ? Container(
                                   width: 120,
                                   height: 120,
-                                  margin: EdgeInsets.only(bottom: 20),
+                                  margin: const EdgeInsets.only(bottom: 20),
                                   decoration: BoxDecoration(
                                       image: DecorationImage(
                                           image: NetworkImage(authController
                                               .myUser.value.image!),
-                                          fit: BoxFit.cover),
+                                          fit: BoxFit.fill),
                                       shape: BoxShape.circle,
-                                      color: Color(0xffD6D6D6)),
+                                      color: const Color(0xffD6D6D6)),
                                 )
                               : Container(
                                   width: 120,
                                   height: 120,
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
+                                  margin: const EdgeInsets.only(bottom: 20),
+                                  decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Color(0xffD6D6D6)),
-                                  child: Center(
+                                  child: const Center(
                                     child: Icon(
                                       Icons.camera_alt_outlined,
                                       size: 40,
@@ -111,13 +107,13 @@ class _MyProfileState extends State<MyProfile> {
                           : Container(
                               width: 120,
                               height: 120,
-                              margin: EdgeInsets.only(bottom: 20),
+                              margin: const EdgeInsets.only(bottom: 20),
                               decoration: BoxDecoration(
                                   image: DecorationImage(
                                       image: FileImage(selectedImage!),
-                                      fit: BoxFit.cover),
+                                      fit: BoxFit.fill),
                                   shape: BoxShape.circle,
-                                  color: Color(0xffD6D6D6)),
+                                  color: const Color(0xffD6D6D6)),
                             ),
                     ),
                   ),
@@ -128,7 +124,7 @@ class _MyProfileState extends State<MyProfile> {
               height: 20,
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 23),
+              padding: const EdgeInsets.symmetric(horizontal: 23),
               child: Form(
                 key: formKey,
                 child: Column(
@@ -149,7 +145,9 @@ class _MyProfileState extends State<MyProfile> {
                         return null;
                       },
                     ),
-                    bigspace,
+                    const SizedBox(
+                      height: 10,
+                    ),
                     TextFieldWidget(
                         'Home Address', Icons.home_outlined, homeController,
                         (String? input) {
@@ -168,12 +166,13 @@ class _MyProfileState extends State<MyProfile> {
                           .buildLatLngFromAddress(p!.description!);
                       homeController.text = p.description!;
 
-                      // /store this information into firebase together once update is clicked
+                      ///store this information into firebase together once update is clicked
                     }, readOnly: true),
-                    bigspace,
-                    TextFieldWidget(
-                        'Occupation ', Icons.card_travel, businessController,
-                        (String? input) {
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextFieldWidget('Business Address', Icons.card_travel,
+                        businessController, (String? input) {
                       if (input!.isEmpty) {
                         return 'Business Address is required!';
                       }
@@ -191,10 +190,13 @@ class _MyProfileState extends State<MyProfile> {
 
                       ///store this information into firebase together once update is clicked
                     }, readOnly: true),
-                    bigspace,
+                    const SizedBox(
+                      height: 10,
+                    ),
                     TextFieldWidget(
-                        'District', Icons.location_on_outlined, shopController,
-                        (String? input) {
+                        'Shopping Center',
+                        Icons.shopping_cart_outlined,
+                        shopController, (String? input) {
                       if (input!.isEmpty) {
                         return 'Shopping Center is required!';
                       }
@@ -212,10 +214,11 @@ class _MyProfileState extends State<MyProfile> {
 
                       ///store this information into firebase together once update is clicked
                     }, readOnly: true),
-                    bigspace,
-                    bigspace,
+                    const SizedBox(
+                      height: 30,
+                    ),
                     Obx(() => authController.isProfileUploading.value
-                        ? Center(
+                        ? const Center(
                             child: CircularProgressIndicator(),
                           )
                         : greenButton('Update', () {
@@ -225,16 +228,15 @@ class _MyProfileState extends State<MyProfile> {
 
                             authController.isProfileUploading(true);
                             authController.storeUserInfo(
-                              selectedImage,
-                              nameController.text,
-                              homeController.text,
-                              businessController.text,
-                              shopController.text,
-                              url: authController.myUser.value.image ?? "",
-                              homeLatLng: homeAddress,
-                              shoppingLatLng: shoppingAddress,
-                              businessLatLng: businessAddress,
-                            );
+                                selectedImage,
+                                nameController.text,
+                                homeController.text,
+                                businessController.text,
+                                shopController.text,
+                                url: authController.myUser.value.image ?? "",
+                                homeLatLng: homeAddress,
+                                shoppingLatLng: shoppingAddress,
+                                businessLatLng: businessAddress);
                           })),
                   ],
                 ),
@@ -257,16 +259,16 @@ class _MyProfileState extends State<MyProfile> {
           style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color.fromARGB(255, 113, 113, 113)),
+              color: const Color(0xffA7A7A7)),
         ),
         const SizedBox(
           height: 6,
         ),
         Container(
           width: Get.width,
-          height: 50,
+          // height: 50,
           decoration: BoxDecoration(
-              color: Color.fromARGB(132, 236, 233, 229),
+              color: Colors.white,
               boxShadow: [
                 BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -282,13 +284,13 @@ class _MyProfileState extends State<MyProfile> {
             style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 173, 171, 171)),
+                color: const Color(0xffA7A7A7)),
             decoration: InputDecoration(
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: Icon(
                   iconData,
-                  color: Color.fromARGB(255, 238, 179, 0),
+                  color: yellow,
                 ),
               ),
               border: InputBorder.none,
