@@ -242,13 +242,19 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
           // height: 50,
           decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                    color: Theme.of(context).primaryColor,
-                    spreadRadius: 1,
-                    blurRadius: 1)
-              ],
-              borderRadius: BorderRadius.circular(8)),
+                  blurRadius: 10,
+                  offset: const Offset(10, 10),
+                  color: Theme.of(context).splashColor,
+                ),
+                BoxShadow(
+                  blurRadius: 10,
+                  offset: const Offset(-10, -10),
+                  color: Theme.of(context).shadowColor,
+                ),
+              ]),
           child: TextFormField(
             readOnly: readOnly,
             onTap: () => onTap!(),
@@ -257,7 +263,7 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).primaryColor),
+                color: Theme.of(context).primaryColorDark),
             decoration: InputDecoration(
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 10),
@@ -284,9 +290,7 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
       child: Text(
         title,
         style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColorDark),
+            fontSize: 16, fontWeight: FontWeight.bold, color: bc),
       ),
     );
   }

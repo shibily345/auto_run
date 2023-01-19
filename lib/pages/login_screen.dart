@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   CountryCode countryCode =
       const CountryCode(name: 'India', code: "IN", dialCode: "+91");
   onSubmit(String? input) {
-    Get.to(() => OtpVerificationScreen(countryCode.dialCode + input!));
+    Get.offAll(() => OtpVerificationScreen(countryCode.dialCode + input!));
   }
 
   @override

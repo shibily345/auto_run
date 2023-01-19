@@ -16,6 +16,7 @@ import 'package:path/path.dart' as Path;
 
 import '../driver/car_registration/car_registration_template.dart';
 import '../driver/profile_setup.dart';
+import '../driver/verification_pending_screen.dart';
 import '../model/userModel.dart';
 import '../pages/home_screen..dart';
 import '../pages/profile_setting.dart';
@@ -88,8 +89,32 @@ class AuthController extends GetxController {
     log("LogedIn");
 
     await FirebaseAuth.instance.signInWithCredential(credential).then((value) {
-      Get.to(homeScreen());
-      decideRoute();
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get()
+            .then((value) {
+          if (isLoginAsDriver) {
+            if (value.exists) {
+              log("Driver HOme Screen");
+              Get.offAll(() => const VerificaitonPendingScreen());
+            } else {
+              Get.offAll(() => const DriverProfileSetup());
+            }
+          } else {
+            if (value.exists) {
+              Get.offAll(() => const homeScreen());
+            } else {
+              Get.offAll(() => const ProfileSettingScreen());
+            }
+          }
+        }).catchError((e) {
+          print("Error while decideRoute is $e");
+        });
+      }
     }).catchError((e) {
       log("Error while sign In $e");
     });
@@ -99,35 +124,8 @@ class AuthController extends GetxController {
 
   decideRoute() {
     if (isDecided) {
-      return;
-    }
-    isDecided = true;
-    log("called");
-
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get()
-          .then((value) {
-        if (isLoginAsDriver) {
-          if (value.exists) {
-            print("Driver HOme Screen");
-          } else {
-            Get.offAll(() => DriverProfileSetup());
-          }
-        } else {
-          if (value.exists) {
-            Get.offAll(() => homeScreen());
-          } else {
-            Get.offAll(() => ProfileSettingScreen());
-          }
-        }
-      }).catchError((e) {
-        print("Error while decideRoute is $e");
-      });
+      isDecided = true;
+      log("calledtoDecided");
     }
   }
 
@@ -160,13 +158,13 @@ class AuthController extends GetxController {
     LatLng? businessLatLng,
     LatLng? shoppingLatLng,
   }) async {
-    String url_new = url;
+    String urlNew = url;
     if (selectedImage != null) {
-      url_new = await uploadImage(selectedImage);
+      urlNew = await uploadImage(selectedImage);
     }
     String uid = FirebaseAuth.instance.currentUser!.uid;
     FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'image': url_new,
+      'image': urlNew,
       'name': name,
       'home_address': home,
       'business_address': business,
@@ -179,7 +177,7 @@ class AuthController extends GetxController {
     }, SetOptions(merge: true)).then((value) {
       isProfileUploading(false);
 
-      Get.to(() => homeScreen());
+      Get.to(() => const homeScreen());
     });
   }
 
@@ -206,7 +204,7 @@ class AuthController extends GetxController {
       context: context,
       mode: Mode.overlay,
       apiKey: apikey,
-      components: [new Component(Component.country, "in")],
+      components: [Component(Component.country, "in")],
       types: [],
       hint: "Search City",
     );
@@ -226,17 +224,17 @@ class AuthController extends GetxController {
     String email, {
     String url = '',
   }) async {
-    String url_new = url;
+    String urlNew = url;
     if (selectedImage != null) {
-      url_new = await uploadImage(selectedImage);
+      urlNew = await uploadImage(selectedImage);
     }
     String uid = FirebaseAuth.instance.currentUser!.uid;
     FirebaseFirestore.instance.collection('users').doc(uid).set(
-        {'image': url_new, 'name': name, 'email': email, 'isDriver': true},
+        {'image': urlNew, 'name': name, 'email': email, 'isDriver': true},
         SetOptions(merge: true)).then((value) {
       isProfileUploading(false);
 
-      Get.off(() => CarRegistrationTemplate());
+      Get.off(() => const CarRegistrationTemplate());
     });
   }
 

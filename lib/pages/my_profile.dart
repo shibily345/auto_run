@@ -59,6 +59,7 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     print(authController.myUser.value.image!);
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -85,7 +86,7 @@ class _MyProfileState extends State<MyProfile> {
                                       image: DecorationImage(
                                           image: NetworkImage(authController
                                               .myUser.value.image!),
-                                          fit: BoxFit.fill),
+                                          fit: BoxFit.cover),
                                       shape: BoxShape.circle,
                                       color: Theme.of(context).primaryColor),
                                 )
@@ -111,7 +112,7 @@ class _MyProfileState extends State<MyProfile> {
                               decoration: BoxDecoration(
                                   image: DecorationImage(
                                       image: FileImage(selectedImage!),
-                                      fit: BoxFit.fill),
+                                      fit: BoxFit.cover),
                                   shape: BoxShape.circle,
                                   color: Theme.of(context).primaryColor),
                             ),
@@ -119,9 +120,6 @@ class _MyProfileState extends State<MyProfile> {
                   ),
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 20,
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 23),
@@ -214,9 +212,8 @@ class _MyProfileState extends State<MyProfile> {
 
                       ///store this information into firebase together once update is clicked
                     }, readOnly: true),
-                    const SizedBox(
-                      height: 30,
-                    ),
+                    bigspace,
+                    litlespace,
                     Obx(() => authController.isProfileUploading.value
                         ? const Center(
                             child: CircularProgressIndicator(),
@@ -254,6 +251,7 @@ class _MyProfileState extends State<MyProfile> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        litlespace,
         Text(
           title,
           style: GoogleFonts.poppins(
@@ -268,14 +266,20 @@ class _MyProfileState extends State<MyProfile> {
           width: Get.width,
           // height: 50,
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                    color: Theme.of(context).primaryColor,
-                    spreadRadius: 1,
-                    blurRadius: 1)
-              ],
-              borderRadius: BorderRadius.circular(8)),
+                  blurRadius: 10,
+                  offset: const Offset(10, 10),
+                  color: Theme.of(context).splashColor,
+                ),
+                BoxShadow(
+                  blurRadius: 10,
+                  offset: const Offset(-10, -10),
+                  color: Theme.of(context).shadowColor,
+                ),
+              ]),
           child: TextFormField(
             readOnly: readOnly,
             onTap: () => onTap!(),
@@ -302,18 +306,33 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Widget greenButton(String title, Function onPressed) {
-    return MaterialButton(
-      minWidth: Get.width,
-      height: 50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      color: yellow,
-      onPressed: () => onPressed(),
-      child: Text(
-        title,
-        style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColorDark),
+    return InkWell(
+      onTap: () => onPressed,
+      child: Container(
+        width: Get.width,
+        height: 50,
+        decoration: BoxDecoration(
+            color: yellow,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 10,
+                offset: const Offset(10, 10),
+                color: Theme.of(context).splashColor,
+              ),
+              BoxShadow(
+                blurRadius: 10,
+                offset: const Offset(-10, -10),
+                color: Theme.of(context).shadowColor,
+              ),
+            ]),
+        child: Center(
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+                fontSize: 16, fontWeight: FontWeight.bold, color: bc),
+          ),
+        ),
       ),
     );
   }

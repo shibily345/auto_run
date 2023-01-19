@@ -14,6 +14,7 @@ class _VerificaitonPendingScreenState extends State<VerificaitonPendingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       body: Column(
         children: [
           greenIntroWidgetWithoutLogos(
@@ -31,7 +32,7 @@ class _VerificaitonPendingScreenState extends State<VerificaitonPendingScreen> {
                 style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black),
+                    color: Theme.of(context).primaryColorDark),
               ),
               const SizedBox(
                 height: 20,
@@ -41,7 +42,7 @@ class _VerificaitonPendingScreenState extends State<VerificaitonPendingScreen> {
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Color(0xff7D7D7D)),
+                    color: Theme.of(context).primaryColorDark),
                 textAlign: TextAlign.center,
               ),
             ],

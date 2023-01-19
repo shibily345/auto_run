@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 import 'package:auto_run/decision_screen/decission_screen.dart';
-import 'package:auto_run/pages/profile_setting.dart';
 import 'package:auto_run/pages/settings.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -20,11 +19,10 @@ import 'package:geocoding/geocoding.dart' as geoCoding;
 import 'package:location/location.dart' as locationo;
 import 'package:location/location.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-
 import '../widgets/slide_up.dart';
 import '../widgets/text_widget.dart';
-import '../widgets/theme_change_button.dart';
 import 'my_profile.dart';
+import 'package:lottie/lottie.dart' as lottie;
 
 class homeScreen extends StatefulWidget {
   const homeScreen({super.key});
@@ -34,7 +32,6 @@ class homeScreen extends StatefulWidget {
 }
 
 class _homeScreenState extends State<homeScreen> {
-  String? _mapStyle;
   String? _mapStyleLight;
   AuthController authController = Get.find<AuthController>();
   final panalController = PanelController();
@@ -50,11 +47,13 @@ class _homeScreenState extends State<homeScreen> {
     '**** **** **** 1233',
     '**** **** **** 4352'
   ];
+
   LocationData? currentLocation;
   void getCurrentLocation() {
     locationo.Location location = locationo.Location();
     location.getLocation().then((location) {
       currentLocation = location;
+
       setState(() {});
     });
   }
@@ -85,17 +84,16 @@ class _homeScreenState extends State<homeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final mapStyle =
-    //     Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-    //         ? _mapStyle
-    //         : _mapStyleLight;
+    final panelHeigtmin = MediaQuery.of(context).size.height * 0.4;
+    final panelHeigtmax = MediaQuery.of(context).size.height * 0.8;
+
     return Scaffold(
       drawer: buildDrawer(context),
       body: SlidingUpPanel(
         color: Theme.of(context).primaryColor,
         controller: panalController,
-        minHeight: Get.height * 0.4,
-        maxHeight: Get.height * 0.8,
+        minHeight: panelHeigtmin,
+        maxHeight: panelHeigtmax,
         panelBuilder: (controller) => panelWidget(
           controller: controller,
           panalController: panalController,
@@ -164,12 +162,16 @@ class _homeScreenState extends State<homeScreen> {
                   children: [
                     InkWell(
                       onTap: () async {
-                        authController.myUser.value.homeAddress! == null
+                        authController.myUser.value.hAddress == null
                             ? const Center(
                                 child: CircularProgressIndicator(),
                               )
-                            : Get.back();
-                        destination = authController.myUser.value.homeAddress!;
+                            : authController.myUser.value.homeAddress == null
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : destination =
+                                    authController.myUser.value.homeAddress!;
                         destinationController.text =
                             authController.myUser.value.hAddress!;
 
@@ -228,15 +230,17 @@ class _homeScreenState extends State<homeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    authController.myUser.value.hAddress!,
-                                    style: TextStyle(
-                                        color:
-                                            Theme.of(context).primaryColorDark,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600),
-                                    textAlign: TextAlign.start,
-                                  ),
+                                  authController.myUser.value.hAddress == null
+                                      ? const Center(child: Text('loading..'))
+                                      : Text(
+                                          authController.myUser.value.hAddress!,
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .primaryColorDark,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600),
+                                          textAlign: TextAlign.start,
+                                        ),
                                 ],
                               ),
                             ),
@@ -249,13 +253,15 @@ class _homeScreenState extends State<homeScreen> {
                     ),
                     InkWell(
                       onTap: () async {
-                        authController.myUser.value.bAddress! == null
+                        authController.myUser.value.bAddress == null
                             ? const Center(
                                 child: CircularProgressIndicator(),
                               )
                             : authController.myUser.value.bussinessAddres ==
                                     null
-                                ? Get.dialog(textWidget(text: 'Add A adress'))
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
                                 : destinationController.text =
                                     authController.myUser.value.bAddress!;
                         destination =
@@ -280,7 +286,6 @@ class _homeScreenState extends State<homeScreen> {
                         setState(() {
                           showSourceField = true;
                         });
-                        Get.back();
                       },
                       child: Container(
                         width: Get.width * 0.38,
@@ -316,15 +321,19 @@ class _homeScreenState extends State<homeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    authController.myUser.value.bAddress!,
-                                    style: TextStyle(
-                                        color:
-                                            Theme.of(context).primaryColorDark,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600),
-                                    textAlign: TextAlign.start,
-                                  ),
+                                  authController.myUser.value.bAddress == null
+                                      ? const Center(
+                                          child:
+                                              Center(child: Text('loading..')))
+                                      : Text(
+                                          authController.myUser.value.bAddress!,
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .primaryColorDark,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600),
+                                          textAlign: TextAlign.start,
+                                        ),
                                 ],
                               ),
                             ),
@@ -366,44 +375,8 @@ class _homeScreenState extends State<homeScreen> {
   Widget buildProfileTile() {
     return Obx(
       () => authController.myUser.value.name == null
-          ? InkWell(
-              onTap: () {
-                Get.to(const ProfileSettingScreen());
-              },
-              child: Column(
-                children: [
-                  Container(
-                    alignment: Alignment.topCenter,
-                    height: 30,
-                    width: Get.width * 0.6,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 10,
-                            offset: const Offset(10, 10),
-                            color: Theme.of(context).splashColor,
-                          ),
-                          BoxShadow(
-                            blurRadius: 10,
-                            offset: const Offset(-10, -10),
-                            color: Theme.of(context).shadowColor,
-                          ),
-                        ]),
-                    child: const Center(
-                      child: Text(
-                        'Set up Profile',
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: yellow),
-                      ),
-                    ),
-                  ),
-                  bigspace,
-                ],
-              ),
+          ? const Center(
+              child: CircularProgressIndicator(),
             )
           : Container(
               width: Get.width,
@@ -426,7 +399,7 @@ class _homeScreenState extends State<homeScreen> {
                       RichText(
                         text: TextSpan(children: [
                           TextSpan(
-                              text: 'Good Morning, ',
+                              text: 'Hey  ',
                               style: TextStyle(
                                   color: Theme.of(context).primaryColorDark,
                                   fontSize: 14)),
@@ -538,9 +511,10 @@ class _homeScreenState extends State<homeScreen> {
   }
 
   late Uint8List markIcons;
-
+  late Uint8List currentIcon;
   loadCustomMarker() async {
-    markIcons = await loadAsset('assets/point.png', 100);
+    markIcons = await loadAsset('assets/destination (1).png', 50);
+    currentIcon = await loadAsset('assets/dot2.png', 50);
   }
 
   Future<Uint8List> loadAsset(String path, int width) async {
@@ -558,51 +532,81 @@ class _homeScreenState extends State<homeScreen> {
       padding: const EdgeInsets.only(
         left: 26,
       ),
-      child: Container(
-        width: Get.width * 0.6,
-        height: 50,
-        padding: const EdgeInsets.only(left: 15),
-        decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                offset: const Offset(10, 10),
-                color: Theme.of(context).splashColor,
-              ),
-              BoxShadow(
-                blurRadius: 10,
-                offset: const Offset(-10, -10),
-                color: Theme.of(context).shadowColor,
-              ),
-            ]),
-        child: TextFormField(
-          controller: sourceController,
-          readOnly: true,
-          onTap: () async {
-            buildSourceSheet();
-          },
-          style: GoogleFonts.poppins(
-            color: Theme.of(context).primaryColorDark,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+      child: Row(
+        children: [
+          Container(
+            width: Get.width * 0.2,
+            height: 50,
+            padding: const EdgeInsets.only(left: 15),
+            decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(10, 10),
+                    color: Theme.of(context).splashColor,
+                  ),
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(-10, -10),
+                    color: Theme.of(context).shadowColor,
+                  ),
+                ]),
+            child: Center(
+              child: lottie.Lottie.asset('assets/63680-on-the-way.json'),
+            ),
           ),
-          decoration: InputDecoration(
-            hintText: 'From',
-            hintStyle: GoogleFonts.poppins(
+          const SizedBox(
+            width: 25,
+          ),
+          Container(
+            width: Get.width * 0.6,
+            height: 50,
+            padding: const EdgeInsets.only(left: 15),
+            decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(10, 10),
+                    color: Theme.of(context).splashColor,
+                  ),
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(-10, -10),
+                    color: Theme.of(context).shadowColor,
+                  ),
+                ]),
+            child: TextFormField(
+              controller: sourceController,
+              readOnly: true,
+              onTap: () async {
+                buildSourceSheet();
+              },
+              style: GoogleFonts.poppins(
+                color: Theme.of(context).primaryColorDark,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColorDark),
-            suffixIcon: const Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Icon(
-                EvaIcons.search,
+              ),
+              decoration: InputDecoration(
+                hintText: 'From',
+                hintStyle: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColorDark),
+                suffixIcon: const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(
+                    EvaIcons.search,
+                  ),
+                ),
+                border: InputBorder.none,
               ),
             ),
-            border: InputBorder.none,
           ),
-        ),
+        ],
       ),
     );
   }
@@ -623,7 +627,7 @@ class _homeScreenState extends State<homeScreen> {
           },
           child: Icon(
             Icons.my_location_outlined,
-            color: Theme.of(context).primaryColorDark,
+            color: Theme.of(context).indicatorColor,
           ),
         ),
       ),
@@ -1223,9 +1227,8 @@ buildDrawer(BuildContext context) {
               buildDrawerItem(context, title: 'Support', onPressed: () {}),
               buildDrawerItem(context, title: 'Log Out', onPressed: () {
                 FirebaseAuth.instance.signOut();
-                Get.to(DecisionScreen());
+                Get.to(() => DecisionScreen());
               }),
-              const ChangeThemeButton(),
             ],
           ),
         ),

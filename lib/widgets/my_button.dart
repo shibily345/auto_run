@@ -46,13 +46,14 @@ Widget DecisionButton(BuildContext context, IconData icon, String text,
             child: Center(
               child: Icon(
                 icon,
+                color: Theme.of(context).indicatorColor,
               ),
             ),
           ),
           Expanded(
               child: Text(
             text,
-            style: const TextStyle(color: Colors.black),
+            style: TextStyle(color: Theme.of(context).primaryColorDark),
             textAlign: TextAlign.center,
           )),
         ],

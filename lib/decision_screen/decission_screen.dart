@@ -34,14 +34,14 @@ class DecisionScreen extends StatelessWidget {
             DecisionButton(context, Icons.local_taxi_rounded, 'Login As Driver',
                 () {
               authController.isLoginAsDriver = true;
-              Get.to(() => const LoginPage());
+              Get.offAll(() => const LoginPage());
             }, Get.width * 0.8),
             const SizedBox(
               height: 30,
             ),
             DecisionButton(context, Icons.person, 'Login As User', () {
               authController.isLoginAsDriver = false;
-              Get.to(() => const LoginPage());
+              Get.offAll(() => const LoginPage());
             }, Get.width * 0.8),
             bigspace,
             bigspace,
