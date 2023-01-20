@@ -18,17 +18,23 @@ class _VehicalNumberPageState extends State<VehicalNumberPage> {
       {Function? onTap, bool readOnly = false}) {
     return Container(
       width: Get.width,
-      margin: EdgeInsets.symmetric(horizontal: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 2),
       // height: 50,
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 2,
-                blurRadius: 1)
-          ],
-          borderRadius: BorderRadius.circular(8)),
+              blurRadius: 10,
+              offset: const Offset(10, 10),
+              color: Theme.of(context).splashColor,
+            ),
+            BoxShadow(
+              blurRadius: 10,
+              offset: const Offset(-10, -10),
+              color: Theme.of(context).shadowColor,
+            ),
+          ]),
       child: TextFormField(
         readOnly: readOnly,
         onTap: () => onTap!(),
@@ -37,13 +43,13 @@ class _VehicalNumberPageState extends State<VehicalNumberPage> {
         style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xffA7A7A7)),
+            color: Theme.of(context).primaryColorDark),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
           hintStyle: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              color: Color(0xff7D7D7D).withOpacity(0.5)),
+              color: Theme.of(context).primaryColorDark),
           hintText: title,
           border: InputBorder.none,
         ),
@@ -60,9 +66,11 @@ class _VehicalNumberPageState extends State<VehicalNumberPage> {
         Text(
           'Vehicle Number ?',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColorDark),
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         ),
         TextFieldWidget(

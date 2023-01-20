@@ -38,6 +38,7 @@ class _DriverProfileSetupState extends State<DriverProfileSetup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -129,14 +130,14 @@ class _DriverProfileSetupState extends State<DriverProfileSetup> {
                       return null;
                     }, onTap: () async {}, readOnly: false),
                     const SizedBox(
-                      height: 30,
+                      height: 60,
                     ),
                     Obx(() => authController.isProfileUploading.value
                         ? const Center(
                             child: CircularProgressIndicator(),
                           )
                         : greenButton('Submit', () {
-                            Get.to(const CarRegistrationTemplate());
+                            Get.offAll(const CarRegistrationTemplate());
                             if (!formKey.currentState!.validate()) {
                               return;
                             }
@@ -182,14 +183,20 @@ class _DriverProfileSetupState extends State<DriverProfileSetup> {
           width: Get.width,
           // height: 50,
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    spreadRadius: 1,
-                    blurRadius: 1)
-              ],
-              borderRadius: BorderRadius.circular(8)),
+                  blurRadius: 10,
+                  offset: const Offset(10, 10),
+                  color: Theme.of(context).splashColor,
+                ),
+                BoxShadow(
+                  blurRadius: 10,
+                  offset: const Offset(-10, -10),
+                  color: Theme.of(context).shadowColor,
+                ),
+              ]),
           child: TextFormField(
             readOnly: readOnly,
             onTap: () => onTap!(),
@@ -198,7 +205,7 @@ class _DriverProfileSetupState extends State<DriverProfileSetup> {
             style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xffA7A7A7)),
+                color: Theme.of(context).primaryColorDark),
             decoration: InputDecoration(
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 10),

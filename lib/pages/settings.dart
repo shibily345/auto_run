@@ -15,7 +15,7 @@ class SettingsScreen extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          textWidget(
+          textWidgets(
               text: "Mode Switch Button",
               color1: Theme.of(context).primaryColorDark,
               fontSize1: 20),

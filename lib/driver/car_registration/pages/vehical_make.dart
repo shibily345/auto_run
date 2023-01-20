@@ -2,7 +2,7 @@ import 'package:auto_run/core/const.dart';
 import 'package:flutter/material.dart';
 
 class VehicalMakePage extends StatefulWidget {
-  VehicalMakePage(
+  const VehicalMakePage(
       {Key? key, required this.onSelect, required this.selectedVehical})
       : super(key: key);
 
@@ -30,11 +30,13 @@ class _VehicalMakePageState extends State<VehicalMakePage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          'What make of vehicle is it ?',
+          'Compeny of vehicle ?',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColorDark),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Expanded(
@@ -42,11 +44,15 @@ class _VehicalMakePageState extends State<VehicalMakePage> {
               itemBuilder: (ctx, i) {
                 return ListTile(
                   onTap: () => widget.onSelect(vehicalMake[i]),
-                  visualDensity: VisualDensity(vertical: -4),
-                  title: Text(vehicalMake[i]),
+                  visualDensity: const VisualDensity(vertical: -4),
+                  title: Text(
+                    vehicalMake[i],
+                    selectionColor: Theme.of(context).indicatorColor,
+                    style: TextStyle(color: Theme.of(context).primaryColorDark),
+                  ),
                   trailing: widget.selectedVehical == vehicalMake[i]
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
+                      ? const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: CircleAvatar(
                             backgroundColor: yellow,
                             child: Icon(
@@ -56,7 +62,7 @@ class _VehicalMakePageState extends State<VehicalMakePage> {
                             ),
                           ),
                         )
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                 );
               },
               itemCount: vehicalMake.length),

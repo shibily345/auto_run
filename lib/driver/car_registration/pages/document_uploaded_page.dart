@@ -18,23 +18,35 @@ class _DocumentUploadedPageState extends State<DocumentUploadedPage> {
         Text(
           'Upload Picture',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColorDark),
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         ),
         Container(
           width: Get.width,
           height: Get.height * 0.1,
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Color(0xffE3E3E3).withOpacity(0.4),
-              border: Border.all(
-                  color: Color(0xff2FB654).withOpacity(0.26), width: 1)),
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10,
+                  offset: const Offset(10, 10),
+                  color: Theme.of(context).splashColor,
+                ),
+                BoxShadow(
+                  blurRadius: 10,
+                  offset: const Offset(-10, -10),
+                  color: Theme.of(context).shadowColor,
+                ),
+              ]),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.cloud_upload,
                 size: 40,
                 color: Color(0xff7D7D7D),
@@ -51,11 +63,12 @@ class _DocumentUploadedPageState extends State<DocumentUploadedPage> {
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black),
+                        color: Theme.of(context).primaryColorDark),
                   ),
                   Text(
                     'waiting For Approval',
-                    style: TextStyle(fontSize: 12, color: Color(0xff62B62F)),
+                    style: TextStyle(
+                        fontSize: 12, color: Theme.of(context).indicatorColor),
                   ),
                 ],
               ),

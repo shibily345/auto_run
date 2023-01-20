@@ -2,7 +2,7 @@ import 'package:auto_run/core/const.dart';
 import 'package:flutter/material.dart';
 
 class VehicalTypePage extends StatefulWidget {
-  VehicalTypePage(
+  const VehicalTypePage(
       {Key? key, required this.onSelect, required this.selectedVehical})
       : super(key: key);
 
@@ -30,9 +30,11 @@ class _VehicalTypePageState extends State<VehicalTypePage> {
         Text(
           'What type of vehicle is it?',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColorDark),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Expanded(
@@ -40,11 +42,15 @@ class _VehicalTypePageState extends State<VehicalTypePage> {
               itemBuilder: (ctx, i) {
                 return ListTile(
                   onTap: () => widget.onSelect(vehicalType[i]),
-                  visualDensity: VisualDensity(vertical: -4),
-                  title: Text(vehicalType[i]),
+                  visualDensity: const VisualDensity(vertical: -4),
+                  title: Text(
+                    vehicalType[i],
+                    selectionColor: Theme.of(context).indicatorColor,
+                    style: TextStyle(color: Theme.of(context).primaryColorDark),
+                  ),
                   trailing: widget.selectedVehical == vehicalType[i]
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
+                      ? const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: CircleAvatar(
                             backgroundColor: yellow,
                             child: Icon(
@@ -54,7 +60,7 @@ class _VehicalTypePageState extends State<VehicalTypePage> {
                             ),
                           ),
                         )
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                 );
               },
               itemCount: vehicalType.length),

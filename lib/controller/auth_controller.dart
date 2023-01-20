@@ -16,7 +16,7 @@ import 'package:path/path.dart' as Path;
 
 import '../driver/car_registration/car_registration_template.dart';
 import '../driver/profile_setup.dart';
-import '../driver/verification_pending_screen.dart';
+import '../driver/screens/driver_home.dart';
 import '../model/userModel.dart';
 import '../pages/home_screen..dart';
 import '../pages/profile_setting.dart';
@@ -99,16 +99,15 @@ class AuthController extends GetxController {
             .then((value) {
           if (isLoginAsDriver) {
             if (value.exists) {
-              log("Driver HOme Screen");
-              Get.offAll(() => const VerificaitonPendingScreen());
+              Get.offAll(() => const DriverHome());
             } else {
-              Get.offAll(() => const DriverProfileSetup());
+              Get.to(() => const DriverProfileSetup());
             }
           } else {
             if (value.exists) {
               Get.offAll(() => const homeScreen());
             } else {
-              Get.offAll(() => const ProfileSettingScreen());
+              Get.to(() => const ProfileSettingScreen());
             }
           }
         }).catchError((e) {

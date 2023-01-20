@@ -3,6 +3,8 @@ import 'package:auto_run/decision_screen/decission_screen.dart';
 import 'package:auto_run/pages/settings.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:georange/georange.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:auto_run/controller/auth_controller.dart';
 import 'package:auto_run/controller/polyline_handler.dart';
@@ -13,7 +15,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:geocoding/geocoding.dart' as geoCoding;
 import 'package:location/location.dart' as locationo;
@@ -49,6 +50,12 @@ class _homeScreenState extends State<homeScreen> {
   ];
 
   LocationData? currentLocation;
+
+  Point get point1 =>
+      Point(latitude: source.latitude, longitude: source.longitude);
+
+  Point get point2 =>
+      Point(latitude: destination.latitude, longitude: destination.longitude);
   void getCurrentLocation() {
     locationo.Location location = locationo.Location();
     location.getLocation().then((location) {
@@ -57,6 +64,8 @@ class _homeScreenState extends State<homeScreen> {
       setState(() {});
     });
   }
+
+  GeoRange georange = GeoRange();
 
   final bool _isElevated = false;
 
@@ -68,9 +77,6 @@ class _homeScreenState extends State<homeScreen> {
 
     authController.getUserInfo();
 
-    // rootBundle.loadString('assets/map_style.txt').then((String) {
-    //   _mapStyle = String;
-    // });
     rootBundle.loadString('assets/map_style_light.txt').then((String) {
       _mapStyleLight = String;
     });
@@ -188,6 +194,9 @@ class _homeScreenState extends State<homeScreen> {
                           position: destination,
                           icon: BitmapDescriptor.fromBytes(markIcons),
                         ));
+                        Point point2 = Point(
+                            latitude: destination.latitude,
+                            longitude: destination.longitude);
 
                         myMapController!.animateCamera(
                             CameraUpdate.newCameraPosition(
@@ -279,7 +288,6 @@ class _homeScreenState extends State<homeScreen> {
                           position: destination,
                           icon: BitmapDescriptor.fromBytes(markIcons),
                         ));
-
                         myMapController!.animateCamera(
                             CameraUpdate.newCameraPosition(
                                 CameraPosition(target: destination, zoom: 14)));
@@ -430,7 +438,7 @@ class _homeScreenState extends State<homeScreen> {
   TextEditingController sourceController = TextEditingController();
 
   bool showSourceField = false;
-
+  bool showDistence = false;
   Widget buildTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 26),
@@ -483,6 +491,7 @@ class _homeScreenState extends State<homeScreen> {
                 ));
             setState(() {
               showSourceField = true;
+              final distance = georange.distance(point1, point2);
             });
           },
           style: GoogleFonts.poppins(
@@ -532,82 +541,135 @@ class _homeScreenState extends State<homeScreen> {
       padding: const EdgeInsets.only(
         left: 26,
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            width: Get.width * 0.2,
-            height: 50,
-            padding: const EdgeInsets.only(left: 15),
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    offset: const Offset(10, 10),
-                    color: Theme.of(context).splashColor,
-                  ),
-                  BoxShadow(
-                    blurRadius: 10,
-                    offset: const Offset(-10, -10),
-                    color: Theme.of(context).shadowColor,
-                  ),
-                ]),
-            child: Center(
-              child: lottie.Lottie.asset('assets/63680-on-the-way.json'),
-            ),
-          ),
-          const SizedBox(
-            width: 25,
-          ),
-          Container(
-            width: Get.width * 0.6,
-            height: 50,
-            padding: const EdgeInsets.only(left: 15),
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    offset: const Offset(10, 10),
-                    color: Theme.of(context).splashColor,
-                  ),
-                  BoxShadow(
-                    blurRadius: 10,
-                    offset: const Offset(-10, -10),
-                    color: Theme.of(context).shadowColor,
-                  ),
-                ]),
-            child: TextFormField(
-              controller: sourceController,
-              readOnly: true,
-              onTap: () async {
-                buildSourceSheet();
-              },
-              style: GoogleFonts.poppins(
-                color: Theme.of(context).primaryColorDark,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              Container(
+                width: Get.width * 0.2,
+                height: 50,
+                padding: const EdgeInsets.only(left: 15),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10,
+                        offset: const Offset(10, 10),
+                        color: Theme.of(context).splashColor,
+                      ),
+                      BoxShadow(
+                        blurRadius: 10,
+                        offset: const Offset(-10, -10),
+                        color: Theme.of(context).shadowColor,
+                      ),
+                    ]),
+                child: Center(
+                  child: lottie.Lottie.asset('assets/63680-on-the-way.json'),
+                ),
               ),
-              decoration: InputDecoration(
-                hintText: 'From',
-                hintStyle: GoogleFonts.poppins(
+              const SizedBox(
+                width: 25,
+              ),
+              Container(
+                width: Get.width * 0.6,
+                height: 50,
+                padding: const EdgeInsets.only(left: 15),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10,
+                        offset: const Offset(10, 10),
+                        color: Theme.of(context).splashColor,
+                      ),
+                      BoxShadow(
+                        blurRadius: 10,
+                        offset: const Offset(-10, -10),
+                        color: Theme.of(context).shadowColor,
+                      ),
+                    ]),
+                child: TextFormField(
+                  controller: sourceController,
+                  readOnly: true,
+                  onTap: () async {
+                    buildSourceSheet();
+                  },
+                  style: GoogleFonts.poppins(
+                    color: Theme.of(context).primaryColorDark,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColorDark),
-                suffixIcon: const Padding(
-                  padding: EdgeInsets.only(left: 10),
-                  child: Icon(
-                    EvaIcons.search,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'From',
+                    hintStyle: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColorDark),
+                    suffixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Icon(
+                        EvaIcons.search,
+                      ),
+                    ),
+                    border: InputBorder.none,
                   ),
                 ),
-                border: InputBorder.none,
               ),
-            ),
+            ],
           ),
+          bigspace,
+          if (showDistence)
+            distenceWidget()
+          else
+            Container(
+              width: Get.width * 0.8,
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 10,
+                      offset: const Offset(10, 10),
+                      color: Theme.of(context).splashColor,
+                    ),
+                    BoxShadow(
+                      blurRadius: 10,
+                      offset: const Offset(-10, -10),
+                      color: Theme.of(context).shadowColor,
+                    ),
+                  ]),
+            )
         ],
       ),
+    );
+  }
+
+  Container distenceWidget() {
+    final distance = georange.distance(point1, point2);
+    return Container(
+      width: Get.width * 0.6,
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 10,
+              offset: const Offset(10, 10),
+              color: Theme.of(context).splashColor,
+            ),
+            BoxShadow(
+              blurRadius: 10,
+              offset: const Offset(-10, -10),
+              color: Theme.of(context).shadowColor,
+            ),
+          ]),
+      child: Text("Distance is: $distance km"),
     );
   }
 
@@ -723,11 +785,12 @@ class _homeScreenState extends State<homeScreen> {
 
               await getPolylines(source, destination);
 
-              // drawPolyline(place);
+              // drawPolyline(place);Point point2 =
+              points();
 
               myMapController!.animateCamera(CameraUpdate.newCameraPosition(
                   CameraPosition(target: source, zoom: 14)));
-              setState(() {});
+
               buildRideConfirmationSheet();
             },
             child: Container(
@@ -833,106 +896,8 @@ class _homeScreenState extends State<homeScreen> {
     ));
   }
 
-  void buildDestinationSheet() {
-    Get.bottomSheet(Container(
-      width: Get.width,
-      height: Get.height * 0.5,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-          color: Theme.of(context).primaryColor),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 10,
-          ),
-          NeumorphicText(
-            "Select Your Destination",
-            textStyle: NeumorphicTextStyle(
-              fontSize: 20,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          bigspace,
-          const SizedBox(
-            height: 10,
-          ),
-          const SizedBox(
-            height: 50,
-          ),
-          InkWell(
-            onTap: () async {
-              Get.back();
-              Prediction? p = await showGoogleAutoComplete(context);
-
-              String selectedPlace = p!.description!;
-              destinationController.text = selectedPlace;
-              List<geoCoding.Location> locations =
-                  await geoCoding.locationFromAddress(selectedPlace);
-
-              destination =
-                  LatLng(locations.first.latitude, locations.first.longitude);
-
-              markers.add(Marker(
-                markerId: MarkerId(selectedPlace),
-                infoWindow: InfoWindow(
-                  title: 'Destination: $selectedPlace',
-                ),
-                position: destination,
-                icon: BitmapDescriptor.fromBytes(markIcons),
-              ));
-
-              myMapController!.animateCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(target: destination, zoom: 14)
-                  //17 is new zoom level
-                  ));
-              setState(() {
-                showSourceField = true;
-              });
-            },
-            child: Container(
-              width: Get.width,
-              height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      offset: const Offset(10, 10),
-                      color: Theme.of(context).splashColor,
-                    ),
-                    BoxShadow(
-                      blurRadius: 10,
-                      offset: const Offset(-10, -10),
-                      color: Theme.of(context).shadowColor,
-                    ),
-                  ]),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Search for Address",
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColorDark,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    ));
-  }
+  Point points() =>
+      Point(latitude: source.latitude, longitude: source.longitude);
 
   buildRideConfirmationSheet() {
     Get.bottomSheet(Container(

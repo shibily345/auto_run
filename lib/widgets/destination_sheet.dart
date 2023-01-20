@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
-final bacgroundColor = const Color(0xFFE7ECEF);
+const bacgroundColor = Color(0xFFE7ECEF);
 Widget cardMorphism() {
   return Neumorphic(
       style: NeumorphicStyle(
@@ -12,5 +12,5 @@ Widget cardMorphism() {
           depth: 8,
           lightSource: LightSource.topLeft,
           color: Colors.grey),
-      child: textWidget(text: 'Enjoy It'));
+      child: textWidgets(text: 'Enjoy It'));
 }

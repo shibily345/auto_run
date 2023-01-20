@@ -2,7 +2,7 @@ import 'package:auto_run/core/const.dart';
 import 'package:flutter/material.dart';
 
 class VehicalModelPage extends StatefulWidget {
-  VehicalModelPage(
+  const VehicalModelPage(
       {Key? key, required this.onSelect, required this.selectedModel})
       : super(key: key);
 
@@ -29,11 +29,13 @@ class _VehicalModelPageState extends State<VehicalModelPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          'What model of vehicle is it ?',
+          'Which model of vehicle is it ?',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColorDark),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Expanded(
@@ -41,11 +43,15 @@ class _VehicalModelPageState extends State<VehicalModelPage> {
           itemBuilder: (ctx, i) {
             return ListTile(
               onTap: () => widget.onSelect(vehicalModel[i]),
-              visualDensity: VisualDensity(vertical: -4),
-              title: Text(vehicalModel[i]),
+              visualDensity: const VisualDensity(vertical: -4),
+              title: Text(
+                vehicalModel[i],
+                selectionColor: Theme.of(context).indicatorColor,
+                style: TextStyle(color: Theme.of(context).primaryColorDark),
+              ),
               trailing: widget.selectedModel == vehicalModel[i]
-                  ? Padding(
-                      padding: const EdgeInsets.all(8.0),
+                  ? const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: CircleAvatar(
                         backgroundColor: yellow,
                         child: Icon(
@@ -55,7 +61,7 @@ class _VehicalModelPageState extends State<VehicalModelPage> {
                         ),
                       ),
                     )
-                  : SizedBox.shrink(),
+                  : const SizedBox.shrink(),
             );
           },
           itemCount: vehicalModel.length,

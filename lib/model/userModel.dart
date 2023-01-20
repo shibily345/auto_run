@@ -28,3 +28,15 @@ class UserModel {
         json['shopping_latlng'].latitude, json['shopping_latlng'].longitude);
   }
 }
+
+class driverModel {
+  String? name;
+  String? image;
+
+  driverModel({this.name, this.image});
+
+  driverModel.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    image = json['image'];
+  }
+}

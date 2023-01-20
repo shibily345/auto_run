@@ -2,7 +2,7 @@ import 'package:auto_run/core/const.dart';
 import 'package:flutter/material.dart';
 
 class LocationPage extends StatefulWidget {
-  LocationPage(
+  const LocationPage(
       {Key? key, required this.selectedLocation, required this.onSelect})
       : super(key: key);
 
@@ -39,11 +39,13 @@ class _LocationPageState extends State<LocationPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          'What Service District you want to register?',
+          'Which Service District you want to register?',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColorDark),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Expanded(
@@ -51,11 +53,15 @@ class _LocationPageState extends State<LocationPage> {
               itemBuilder: (ctx, i) {
                 return ListTile(
                   onTap: () => widget.onSelect(locations[i]),
-                  visualDensity: VisualDensity(vertical: -4),
-                  title: Text(locations[i]),
+                  visualDensity: const VisualDensity(vertical: -4),
+                  title: Text(
+                    locations[i],
+                    selectionColor: Theme.of(context).indicatorColor,
+                    style: TextStyle(color: Theme.of(context).primaryColorDark),
+                  ),
                   trailing: widget.selectedLocation == locations[i]
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
+                      ? const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: CircleAvatar(
                             backgroundColor: yellow,
                             child: Icon(
@@ -65,7 +71,7 @@ class _LocationPageState extends State<LocationPage> {
                             ),
                           ),
                         )
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                 );
               },
               itemCount: locations.length),

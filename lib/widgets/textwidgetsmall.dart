@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 
-Widget textWidget(
+Widget textWidgets(
     {required String text,
     double fontSize1 = 15,
     FontWeight fontWeight1 = FontWeight.normal,

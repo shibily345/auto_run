@@ -46,6 +46,7 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   flutter_svg: ^1.1.6
   geocoding: ^2.0.5
+  georange: ^1.0.0
   get: ^4.6.5
   google_fonts: ^3.0.1
   google_maps_flutter: ^2.2.3

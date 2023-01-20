@@ -40,6 +40,7 @@ class _CarRegistrationTemplateState extends State<CarRegistrationTemplate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       body: Column(
         children: [
           greenIntroWidgetWithoutLogos(
@@ -56,7 +57,7 @@ class _CarRegistrationTemplateState extends State<CarRegistrationTemplate> {
                   currentPage = page;
                 },
                 controller: pageController,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   LocationPage(
                     selectedLocation: selectedLocation,
@@ -110,7 +111,7 @@ class _CarRegistrationTemplateState extends State<CarRegistrationTemplate> {
                       document = image;
                     },
                   ),
-                  DocumentUploadedPage()
+                  const DocumentUploadedPage()
                 ],
               ),
             ),
@@ -120,7 +121,7 @@ class _CarRegistrationTemplateState extends State<CarRegistrationTemplate> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Obx(() => isUploading.value
-                    ? Center(
+                    ? const Center(
                         child: CircularProgressIndicator(),
                       )
                     : FloatingActionButton(
@@ -133,11 +134,11 @@ class _CarRegistrationTemplateState extends State<CarRegistrationTemplate> {
                             uploadDriverCarEntry();
                           }
                         },
-                        child: Icon(
+                        backgroundColor: yellow,
+                        child: const Icon(
                           Icons.arrow_forward,
                           color: Colors.white,
                         ),
-                        backgroundColor: yellow,
                       )),
               )),
         ],
@@ -164,6 +165,6 @@ class _CarRegistrationTemplateState extends State<CarRegistrationTemplate> {
 
     await Get.find<AuthController>().uploadCarEntry(carData);
     isUploading(false);
-    Get.off(() => VerificaitonPendingScreen());
+    Get.off(() => const VerificaitonPendingScreen());
   }
 }

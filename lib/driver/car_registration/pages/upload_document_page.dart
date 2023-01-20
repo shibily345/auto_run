@@ -36,9 +36,11 @@ class _UploadDocumentPageState extends State<UploadDocumentPage> {
         Text(
           'Upload Documents',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColorDark),
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         ),
         GestureDetector(
@@ -49,14 +51,24 @@ class _UploadDocumentPageState extends State<UploadDocumentPage> {
             width: Get.width,
             height: Get.height * 0.25,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Color(0xffE3E3E3).withOpacity(0.4),
-                border: Border.all(
-                    color: Color(0xff2FB654).withOpacity(0.26), width: 1)),
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(10, 10),
+                    color: Theme.of(context).splashColor,
+                  ),
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(-10, -10),
+                    color: Theme.of(context).shadowColor,
+                  ),
+                ]),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.cloud_upload,
                   size: 40,
                   color: Color(0xff7D7D7D),
@@ -68,7 +80,7 @@ class _UploadDocumentPageState extends State<UploadDocumentPage> {
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xff7D7D7D)),
+                      color: Theme.of(context).indicatorColor),
                 ),
               ],
             ),

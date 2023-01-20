@@ -14,10 +14,10 @@ Widget loginWidget(BuildContext context, CountryCode countryCode,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          textWidget(
+          textWidgets(
               text: 'Hello, Nice To Meet You',
               color1: Theme.of(context).indicatorColor),
-          textWidget(
+          textWidgets(
             text: "Go With Riksaw 'Wherever Whenever'",
             color1: Theme.of(context).primaryColorDark,
             fontSize1: 20,
@@ -60,7 +60,7 @@ Widget loginWidget(BuildContext context, CountryCode countryCode,
                                 ),
                               ),
                             ),
-                            textWidget(
+                            textWidgets(
                                 text: countryCode.dialCode,
                                 color1: Theme.of(context).primaryColorDark),
                             Icon(

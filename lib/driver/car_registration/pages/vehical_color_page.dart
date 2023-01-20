@@ -27,24 +27,32 @@ class _VehicalColorPageState extends State<VehicalColorPage> {
   buildDropDown() {
     return Container(
       width: Get.width,
-      margin: EdgeInsets.symmetric(horizontal: 2),
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       // height: 50,
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 2,
-                blurRadius: 1)
-          ],
-          borderRadius: BorderRadius.circular(8)),
+              blurRadius: 10,
+              offset: const Offset(10, 10),
+              color: Theme.of(context).splashColor,
+            ),
+            BoxShadow(
+              blurRadius: 10,
+              offset: const Offset(-10, -10),
+              color: Theme.of(context).shadowColor,
+            ),
+          ]),
       child: DropdownButton(
         // Initial Value
         value: dropdownvalue,
 
         isExpanded: true,
-        underline: Container(),
+        underline: Container(
+          color: Theme.of(context).primaryColor,
+        ),
 
         // Down Arrow Icon
         icon: const Icon(Icons.keyboard_arrow_down),
@@ -53,7 +61,10 @@ class _VehicalColorPageState extends State<VehicalColorPage> {
         items: colors.map((String items) {
           return DropdownMenuItem(
             value: items,
-            child: Text(items),
+            child: Text(
+              items,
+              style: TextStyle(color: Theme.of(context).primaryColorDark),
+            ),
           );
         }).toList(),
         // After selecting the desired option,it will
@@ -75,11 +86,13 @@ class _VehicalColorPageState extends State<VehicalColorPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          'What color of vehicle is it ?',
+          'Which color of vehicle is it ?',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColorDark),
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         ),
         buildDropDown(),
