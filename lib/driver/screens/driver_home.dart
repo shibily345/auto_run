@@ -1,4 +1,6 @@
 import 'package:auto_run/core/const.dart';
+import 'package:auto_run/widgets/text_widget.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -50,51 +52,55 @@ class _DriverHomeState extends State<DriverHome> {
 
   @override
   Widget build(BuildContext context) {
-    final panelHeigtmin = MediaQuery.of(context).size.height * 0.4;
+    final panelHeigtmin = MediaQuery.of(context).size.height * 0.1;
     final panelHeigtmax = MediaQuery.of(context).size.height * 0.8;
     return Scaffold(
       drawer: buildDrawer(context),
-      body: SlidingUpPanel(
-        color: Theme.of(context).primaryColor,
-        controller: panalController,
-        minHeight: panelHeigtmin,
-        maxHeight: panelHeigtmax,
-        panelBuilder: (controller) => panelWidget(
-          controller: controller,
-          panalController: panalController,
-        ),
-        parallaxEnabled: true,
-        parallaxOffset: .5,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        body: Stack(
-          children: [
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: currentLocation == null
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : GoogleMap(
-                      zoomControlsEnabled: false,
-                      onMapCreated: (GoogleMapController controller) {
-                        myMapController = controller;
-                        setState(() {
-                          myMapController!.setMapStyle(_mapStyleLight);
-                        });
-                      },
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(currentLocation!.latitude!,
-                            currentLocation!.longitude!),
-                        zoom: 15,
-                      ),
-                    ),
+      body: Stack(
+        children: [
+          SlidingUpPanel(
+            color: Theme.of(context).primaryColor,
+            controller: panalController,
+            minHeight: panelHeigtmin,
+            maxHeight: panelHeigtmax,
+            panelBuilder: (controller) => panelWidget(
+              controller: controller,
+              panalController: panalController,
             ),
-            drawerBar(authController: authController),
-          ],
-        ),
+            parallaxEnabled: true,
+            parallaxOffset: .5,
+            body: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: currentLocation == null
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : GoogleMap(
+                          zoomControlsEnabled: false,
+                          onMapCreated: (GoogleMapController controller) {
+                            myMapController = controller;
+                            setState(() {
+                              myMapController!.setMapStyle(_mapStyleLight);
+                            });
+                          },
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(currentLocation!.latitude!,
+                                currentLocation!.longitude!),
+                            zoom: 15,
+                          ),
+                        ),
+                ),
+                Positioned(bottom: 150, child: builFAB(context)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -105,29 +111,13 @@ class _DriverHomeState extends State<DriverHome> {
     return ListView(
         controller: controller,
         padding: EdgeInsets.zero,
-        children: <Widget>[
-          litlespace,
-          InkWell(
-            child: Center(
-              child: Container(
-                width: 50,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColorDark,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-          bigspace,
-          buildProfileTile()
-        ]);
+        children: <Widget>[litlespace, buildStatus()]);
   }
 
-  Widget buildProfileTile() {
+  Widget buildStatus() {
     return Container(
       width: Get.width,
-      height: 70,
+      height: 60,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
       ),
@@ -139,31 +129,44 @@ class _DriverHomeState extends State<DriverHome> {
           const SizedBox(
             width: 15,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
+          Row(
             children: [
-              RichText(
-                text: TextSpan(children: [
-                  TextSpan(
-                      text: 'Hey  ',
-                      style: TextStyle(
-                          color: Theme.of(context).primaryColorDark,
-                          fontSize: 14)),
-                  const TextSpan(
-                      text: 'Shibil',
-                      style: TextStyle(
-                          color: yellow,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold)),
-                ]),
+              IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: Icon(
+                  size: 35,
+                  color: Theme.of(context).primaryColorDark,
+                  Icons.keyboard_arrow_up_rounded,
+                ),
               ),
-              Text(
-                "Redy To Go ..",
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColorDark),
+              Padding(
+                padding: const EdgeInsets.only(left: 74),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    textWidget(
+                        text: "Offline",
+                        color: Theme.of(context).primaryColorDark,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold),
+                    textWidget(text: 'text')
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: 95,
+              ),
+              IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: Icon(
+                  size: 25,
+                  color: Theme.of(context).primaryColorDark,
+                  EvaIcons.menu2Outline,
+                ),
               )
             ],
           ),
@@ -171,4 +174,21 @@ class _DriverHomeState extends State<DriverHome> {
       ),
     );
   }
+
+  Widget builFAB(BuildContext context) => Transform.scale(
+        scale: 1.5,
+        child: FloatingActionButton(
+          onPressed: () {},
+          child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: textWidget(
+                    text: "GO", fontSize: 20, fontWeight: FontWeight.bold),
+              )),
+        ),
+      );
 }

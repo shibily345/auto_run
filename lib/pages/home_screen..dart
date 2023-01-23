@@ -51,11 +51,6 @@ class _homeScreenState extends State<homeScreen> {
 
   LocationData? currentLocation;
 
-  Point get point1 =>
-      Point(latitude: source.latitude, longitude: source.longitude);
-
-  Point get point2 =>
-      Point(latitude: destination.latitude, longitude: destination.longitude);
   void getCurrentLocation() {
     locationo.Location location = locationo.Location();
     location.getLocation().then((location) {
@@ -68,7 +63,8 @@ class _homeScreenState extends State<homeScreen> {
   GeoRange georange = GeoRange();
 
   final bool _isElevated = false;
-
+  bool showSourceField = false;
+  bool showDistence = false;
   @override
   void initState() {
     getCurrentLocation();
@@ -82,11 +78,14 @@ class _homeScreenState extends State<homeScreen> {
     });
   }
 
+  Point get point1 =>
+      Point(latitude: source.latitude, longitude: source.longitude);
+
+  Point get point2 =>
+      Point(latitude: destination.latitude, longitude: destination.longitude);
   String dropdownValue = '**** **** **** 8789';
 
   GoogleMapController? myMapController;
-
-  // final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
@@ -145,220 +144,279 @@ class _homeScreenState extends State<homeScreen> {
   Widget panelWidget(
       {required ScrollController controller,
       required PanelController panalController}) {
-    return ListView(
-      controller: controller,
-      padding: EdgeInsets.zero,
-      children: <Widget>[
-        litlespace,
-        buildDragHandle(),
-        bigspace,
-        buildProfileTile(),
-        buildTextField(),
-        bigspace,
-        Row(
-          children: [
-            if (showSourceField)
-              buildTextFieldFrom()
-            else
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 26),
-                height: 106,
-                width: Get.width,
+    if (showDistence) {
+      final distance = georange.distance(point2, point1);
+      double prizePerKm = 30;
+      String fixedNumber = distance.toStringAsFixed(1);
+      double totalPrize = distance * prizePerKm;
+      int roundPrize = totalPrize.round();
+      return ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          litlespace,
+          buildDragHandle(),
+          bigspace,
+          SizedBox(
+            height: 200,
+            child: Center(
+              child: lottie.Lottie.asset('assets/81133-waiting.json'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Container(
+                width: Get.width * 0.6,
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10,
+                        offset: const Offset(10, 10),
+                        color: Theme.of(context).splashColor,
+                      ),
+                      BoxShadow(
+                        blurRadius: 10,
+                        offset: const Offset(-10, -10),
+                        color: Theme.of(context).shadowColor,
+                      ),
+                    ]),
                 child: Row(
                   children: [
-                    InkWell(
-                      onTap: () async {
-                        authController.myUser.value.hAddress == null
-                            ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : authController.myUser.value.homeAddress == null
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : destination =
-                                    authController.myUser.value.homeAddress!;
-                        destinationController.text =
-                            authController.myUser.value.hAddress!;
-
-                        if (markers.length >= 2) {
-                          markers.remove(markers.last);
-                        }
-                        markers.add(Marker(
-                          markerId:
-                              MarkerId(authController.myUser.value.hAddress!),
-                          infoWindow: InfoWindow(
-                            title:
-                                'Destination: ${authController.myUser.value.hAddress!}',
-                          ),
-                          position: destination,
-                          icon: BitmapDescriptor.fromBytes(markIcons),
-                        ));
-                        Point point2 = Point(
-                            latitude: destination.latitude,
-                            longitude: destination.longitude);
-
-                        myMapController!.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                                CameraPosition(target: destination, zoom: 14)));
-                        setState(() {
-                          showSourceField = true;
-                        });
-                      },
-                      child: Container(
-                        width: Get.width * 0.38,
-                        height: 100,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10,
-                                offset: const Offset(10, 10),
-                                color: Theme.of(context).splashColor,
-                              ),
-                              BoxShadow(
-                                blurRadius: 10,
-                                offset: const Offset(-10, -10),
-                                color: Theme.of(context).shadowColor,
-                              ),
-                            ]),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.house_rounded,
-                              color: yellow,
-                              size: 65,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  authController.myUser.value.hAddress == null
-                                      ? const Center(child: Text('loading..'))
-                                      : Text(
-                                          authController.myUser.value.hAddress!,
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .primaryColorDark,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600),
-                                          textAlign: TextAlign.start,
-                                        ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 40,
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        authController.myUser.value.bAddress == null
-                            ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : authController.myUser.value.bussinessAddres ==
-                                    null
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : destinationController.text =
-                                    authController.myUser.value.bAddress!;
-                        destination =
-                            authController.myUser.value.bussinessAddres!;
-                        if (markers.length >= 2) {
-                          markers.remove(markers.last);
-                        }
-                        markers.add(Marker(
-                          markerId:
-                              MarkerId(authController.myUser.value.bAddress!),
-                          infoWindow: InfoWindow(
-                            title:
-                                'Destination: ${authController.myUser.value.bAddress!}',
-                          ),
-                          position: destination,
-                          icon: BitmapDescriptor.fromBytes(markIcons),
-                        ));
-                        myMapController!.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                                CameraPosition(target: destination, zoom: 14)));
-                        setState(() {
-                          showSourceField = true;
-                        });
-                      },
-                      child: Container(
-                        width: Get.width * 0.38,
-                        height: 100,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10,
-                                offset: const Offset(10, 10),
-                                color: Theme.of(context).splashColor,
-                              ),
-                              BoxShadow(
-                                blurRadius: 10,
-                                offset: const Offset(-10, -10),
-                                color: Theme.of(context).shadowColor,
-                              ),
-                            ]),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.location_city_rounded,
-                              color: yellow,
-                              size: 65,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  authController.myUser.value.bAddress == null
-                                      ? const Center(
-                                          child:
-                                              Center(child: Text('loading..')))
-                                      : Text(
-                                          authController.myUser.value.bAddress!,
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .primaryColorDark,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600),
-                                          textAlign: TextAlign.start,
-                                        ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    textWidget(
+                        fontSize: 15,
+                        text: "Distance is: $fixedNumber km",
+                        color: Theme.of(context).indicatorColor),
+                    const Spacer(),
+                    textWidget(
+                        fontSize: 15,
+                        text: "Totel ₹ $roundPrize Rs",
+                        color: Theme.of(context).indicatorColor),
                   ],
+                )),
+          )
+        ],
+      );
+    } else {
+      return ListView(
+        controller: controller,
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          litlespace,
+          buildDragHandle(),
+          bigspace,
+          buildProfileTile(),
+          buildTextField(),
+          bigspace,
+          Row(
+            children: [
+              if (showSourceField)
+                buildTextFieldFrom()
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 26),
+                  height: 106,
+                  width: Get.width,
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          authController.myUser.value.hAddress == null
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : authController.myUser.value.homeAddress == null
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : destination =
+                                      authController.myUser.value.homeAddress!;
+                          destinationController.text =
+                              authController.myUser.value.hAddress!;
+
+                          if (markers.length >= 2) {
+                            markers.remove(markers.last);
+                          }
+                          markers.add(Marker(
+                            markerId:
+                                MarkerId(authController.myUser.value.hAddress!),
+                            infoWindow: InfoWindow(
+                              title:
+                                  'Destination: ${authController.myUser.value.hAddress!}',
+                            ),
+                            position: destination,
+                            icon: BitmapDescriptor.fromBytes(markIcons),
+                          ));
+                          Point point2 = Point(
+                              latitude: destination.latitude,
+                              longitude: destination.longitude);
+
+                          myMapController!.animateCamera(
+                              CameraUpdate.newCameraPosition(CameraPosition(
+                                  target: destination, zoom: 14)));
+                          setState(() {
+                            showSourceField = true;
+                          });
+                        },
+                        child: Container(
+                          width: Get.width * 0.38,
+                          height: 100,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  offset: const Offset(10, 10),
+                                  color: Theme.of(context).splashColor,
+                                ),
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  offset: const Offset(-10, -10),
+                                  color: Theme.of(context).shadowColor,
+                                ),
+                              ]),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.house_rounded,
+                                color: yellow,
+                                size: 65,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    authController.myUser.value.hAddress == null
+                                        ? const Center(child: Text('loading..'))
+                                        : Text(
+                                            authController
+                                                .myUser.value.hAddress!,
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColorDark,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600),
+                                            textAlign: TextAlign.start,
+                                          ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 40,
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          authController.myUser.value.bAddress == null
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : authController.myUser.value.bussinessAddres ==
+                                      null
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : destinationController.text =
+                                      authController.myUser.value.bAddress!;
+                          destination =
+                              authController.myUser.value.bussinessAddres!;
+                          if (markers.length >= 2) {
+                            markers.remove(markers.last);
+                          }
+                          markers.add(Marker(
+                            markerId:
+                                MarkerId(authController.myUser.value.bAddress!),
+                            infoWindow: InfoWindow(
+                              title:
+                                  'Destination: ${authController.myUser.value.bAddress!}',
+                            ),
+                            position: destination,
+                            icon: BitmapDescriptor.fromBytes(markIcons),
+                          ));
+                          myMapController!.animateCamera(
+                              CameraUpdate.newCameraPosition(CameraPosition(
+                                  target: destination, zoom: 14)));
+                          setState(() {
+                            showSourceField = true;
+                          });
+                        },
+                        child: Container(
+                          width: Get.width * 0.38,
+                          height: 100,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  offset: const Offset(10, 10),
+                                  color: Theme.of(context).splashColor,
+                                ),
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  offset: const Offset(-10, -10),
+                                  color: Theme.of(context).shadowColor,
+                                ),
+                              ]),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.location_city_rounded,
+                                color: yellow,
+                                size: 65,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    authController.myUser.value.bAddress == null
+                                        ? const Center(
+                                            child: Center(
+                                                child: Text('loading..')))
+                                        : Text(
+                                            authController
+                                                .myUser.value.bAddress!,
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColorDark,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600),
+                                            textAlign: TextAlign.start,
+                                          ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            // Spacer(),
-            // buildCurrentLocationIcon(),
-          ],
-        ),
-        bigspace,
-      ],
-    );
+              // Spacer(),
+              // buildCurrentLocationIcon(),
+            ],
+          ),
+          bigspace,
+        ],
+      );
+    }
   }
 
   Widget buildDragHandle() {
@@ -374,10 +432,6 @@ class _homeScreenState extends State<homeScreen> {
         ),
       ),
     );
-  }
-
-  void togglePanel() {
-    return;
   }
 
   Widget buildProfileTile() {
@@ -437,8 +491,6 @@ class _homeScreenState extends State<homeScreen> {
   TextEditingController destinationController = TextEditingController();
   TextEditingController sourceController = TextEditingController();
 
-  bool showSourceField = false;
-  bool showDistence = false;
   Widget buildTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 26),
@@ -491,7 +543,6 @@ class _homeScreenState extends State<homeScreen> {
                 ));
             setState(() {
               showSourceField = true;
-              final distance = georange.distance(point1, point2);
             });
           },
           style: GoogleFonts.poppins(
@@ -620,56 +671,8 @@ class _homeScreenState extends State<homeScreen> {
             ],
           ),
           bigspace,
-          if (showDistence)
-            distenceWidget()
-          else
-            Container(
-              width: Get.width * 0.8,
-              height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 10,
-                      offset: const Offset(10, 10),
-                      color: Theme.of(context).splashColor,
-                    ),
-                    BoxShadow(
-                      blurRadius: 10,
-                      offset: const Offset(-10, -10),
-                      color: Theme.of(context).shadowColor,
-                    ),
-                  ]),
-            )
         ],
       ),
-    );
-  }
-
-  Container distenceWidget() {
-    final distance = georange.distance(point1, point2);
-    return Container(
-      width: Get.width * 0.6,
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              offset: const Offset(10, 10),
-              color: Theme.of(context).splashColor,
-            ),
-            BoxShadow(
-              blurRadius: 10,
-              offset: const Offset(-10, -10),
-              color: Theme.of(context).shadowColor,
-            ),
-          ]),
-      child: Text("Distance is: $distance km"),
     );
   }
 
@@ -836,7 +839,7 @@ class _homeScreenState extends State<homeScreen> {
                       currentLocation!.latitude!, currentLocation!.longitude!)
                   .toString();
               sourceController.text = selectedPlace;
-              myLocation = LatLng(
+              source = LatLng(
                   currentLocation!.latitude!, currentLocation!.longitude!);
 
               if (markers.length >= 2) {
@@ -847,11 +850,11 @@ class _homeScreenState extends State<homeScreen> {
                   infoWindow: InfoWindow(
                     title: 'Source: $selectedPlace',
                   ),
-                  position: myLocation));
-              await getPolylines(myLocation, destination);
+                  position: source));
+              await getPolylines(source, destination);
 
               myMapController!.animateCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(target: myLocation, zoom: 14)
+                  CameraPosition(target: source, zoom: 14)
                   //17 is new zoom level
                   ));
               setState(() {});
@@ -944,6 +947,9 @@ class _homeScreenState extends State<homeScreen> {
                 Expanded(child: buildPaymentCardWidget()),
                 MaterialButton(
                   onPressed: () {
+                    setState(() {
+                      showDistence = true;
+                    });
                     Get.back();
                   },
                   color: yellow,

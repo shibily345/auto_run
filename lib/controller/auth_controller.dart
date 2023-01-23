@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:auto_run/core/const.dart';
+import 'package:auto_run/driver/screens/driver_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -16,7 +17,6 @@ import 'package:path/path.dart' as Path;
 
 import '../driver/car_registration/car_registration_template.dart';
 import '../driver/profile_setup.dart';
-import '../driver/screens/driver_home.dart';
 import '../model/userModel.dart';
 import '../pages/home_screen..dart';
 import '../pages/profile_setting.dart';
@@ -89,6 +89,12 @@ class AuthController extends GetxController {
     log("LogedIn");
 
     await FirebaseAuth.instance.signInWithCredential(credential).then((value) {
+      if (isDecided) {
+        isDecided = true;
+        print("called");
+      }
+
+      ///step 1- Check user login?
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
@@ -97,17 +103,20 @@ class AuthController extends GetxController {
             .doc(user.uid)
             .get()
             .then((value) {
+          ///isLoginAsDriver == true means navigate it to driver module
+
           if (isLoginAsDriver) {
             if (value.exists) {
               Get.offAll(() => const DriverHome());
+              print("Driver HOme Screen");
             } else {
-              Get.to(() => const DriverProfileSetup());
+              Get.offAll(() => const DriverProfileSetup());
             }
           } else {
             if (value.exists) {
               Get.offAll(() => const homeScreen());
             } else {
-              Get.to(() => const ProfileSettingScreen());
+              Get.offAll(() => const ProfileSettingScreen());
             }
           }
         }).catchError((e) {
@@ -115,7 +124,7 @@ class AuthController extends GetxController {
         });
       }
     }).catchError((e) {
-      log("Error while sign In $e");
+      print("Error while sign In $e");
     });
   }
 
@@ -123,8 +132,42 @@ class AuthController extends GetxController {
 
   decideRoute() {
     if (isDecided) {
-      isDecided = true;
-      log("calledtoDecided");
+      return;
+    }
+    isDecided = true;
+    print("called");
+
+    ///step 1- Check user login?
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      /// step 2- Check whether user profile exists?
+
+      ///isLoginAsDriver == true means navigate it to the driver module
+
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get()
+          .then((value) {
+        ///isLoginAsDriver == true means navigate it to driver module
+
+        if (isLoginAsDriver) {
+          if (value.exists) {
+            print("Driver HOme Screen");
+          } else {
+            Get.offAll(() => const DriverProfileSetup());
+          }
+        } else {
+          if (value.exists) {
+            Get.offAll(() => const homeScreen());
+          } else {
+            Get.offAll(() => const ProfileSettingScreen());
+          }
+        }
+      }).catchError((e) {
+        print("Error while decideRoute is $e");
+      });
     }
   }
 

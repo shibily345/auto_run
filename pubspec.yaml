@@ -51,6 +51,7 @@ dependencies:
   google_fonts: ^3.0.1
   google_maps_flutter: ^2.2.3
   google_maps_webservice: null
+  http: ^0.13.5
   image_picker: ^0.8.6
   location: ^4.4.0
   lottie: ^2.2.0
