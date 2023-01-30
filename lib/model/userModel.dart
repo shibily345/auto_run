@@ -21,7 +21,7 @@ class UserModel {
     name = json['name'];
     image = json['image'];
     homeAddress =
-        LatLng(json['home_latlng'].latitude, json['home_latlng'].longitude);
+        LatLng(json['home_latlng'].latitude!, json['home_latlng'].longitude);
     bussinessAddres = LatLng(
         json['business_latlng'].latitude, json['business_latlng'].longitude);
     shoppingAddress = LatLng(
@@ -29,13 +29,13 @@ class UserModel {
   }
 }
 
-class driverModel {
+class DriverModel {
   String? name;
   String? image;
 
-  driverModel({this.name, this.image});
+  DriverModel({this.name, this.image});
 
-  driverModel.fromJson(Map<String, dynamic> json) {
+  DriverModel.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     image = json['image'];
   }

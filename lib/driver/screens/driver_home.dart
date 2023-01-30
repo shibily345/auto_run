@@ -11,7 +11,6 @@ import 'package:location/location.dart' as locationo;
 import '../../controller/auth_controller.dart';
 import '../../model/userModel.dart';
 import '../../pages/home_screen..dart';
-import '../../widgets/slide_up.dart';
 
 class DriverHome extends StatefulWidget {
   const DriverHome({super.key});
@@ -23,7 +22,7 @@ class DriverHome extends StatefulWidget {
 class _DriverHomeState extends State<DriverHome> {
   AuthController authController = Get.find<AuthController>();
   final panalController = PanelController();
-  var myUser = driverModel().obs;
+  var myUser = DriverModel().obs;
   String? _mapStyleLight;
   GoogleMapController? myMapController;
   @override
@@ -40,6 +39,7 @@ class _DriverHomeState extends State<DriverHome> {
     });
   }
 
+  bool isOnline = false;
   LocationData? currentLocation;
   void getCurrentLocation() {
     locationo.Location location = locationo.Location();
@@ -96,7 +96,24 @@ class _DriverHomeState extends State<DriverHome> {
                           ),
                         ),
                 ),
-                Positioned(bottom: 150, child: builFAB(context)),
+                isOnline == true
+                    ? Positioned(
+                        top: 40,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 50,
+                              width: Get.width * 0.3,
+                              decoration: BoxDecoration(
+                                color: yellow,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Positioned(bottom: 120, child: builFAB(context)),
               ],
             ),
           ),
@@ -111,7 +128,16 @@ class _DriverHomeState extends State<DriverHome> {
     return ListView(
         controller: controller,
         padding: EdgeInsets.zero,
-        children: <Widget>[litlespace, buildStatus()]);
+        children: <Widget>[
+          litlespace,
+          buildStatus(),
+          isOnline == true
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 300),
+                  child: builFAB(context),
+                )
+              : const SizedBox()
+        ]);
   }
 
   Widget buildStatus() {
@@ -131,31 +157,39 @@ class _DriverHomeState extends State<DriverHome> {
           ),
           Row(
             children: [
-              IconButton(
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                icon: Icon(
-                  size: 35,
-                  color: Theme.of(context).primaryColorDark,
-                  Icons.keyboard_arrow_up_rounded,
-                ),
-              ),
+              Builder(builder: (context) {
+                return IconButton(
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  icon: Icon(
+                    size: 35,
+                    color: Theme.of(context).primaryColorDark,
+                    Icons.keyboard_arrow_up_rounded,
+                  ),
+                );
+              }),
               Padding(
                 padding: const EdgeInsets.only(left: 74),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    textWidget(
-                        text: "Offline",
-                        color: Theme.of(context).primaryColorDark,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold),
-                    textWidget(text: 'text')
+                    isOnline == true
+                        ? textWidget(
+                            text: "Online",
+                            color: Theme.of(context).indicatorColor,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold)
+                        : textWidget(
+                            text: "Offline",
+                            color: Theme.of(context).primaryColorDark,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold),
+                    textWidget(text: 'Go ')
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 95,
               ),
               IconButton(
@@ -178,7 +212,11 @@ class _DriverHomeState extends State<DriverHome> {
   Widget builFAB(BuildContext context) => Transform.scale(
         scale: 1.5,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            setState(() {
+              isOnline = isOnline ? false : true;
+            });
+          },
           child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -186,8 +224,10 @@ class _DriverHomeState extends State<DriverHome> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: textWidget(
-                    text: "GO", fontSize: 20, fontWeight: FontWeight.bold),
+                child: isOnline == true
+                    ? const Icon(Icons.waving_hand_sharp)
+                    : textWidget(
+                        text: "GO", fontSize: 20, fontWeight: FontWeight.bold),
               )),
         ),
       );

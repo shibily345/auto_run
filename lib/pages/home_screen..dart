@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'dart:ui' as ui;
 import 'package:auto_run/decision_screen/decission_screen.dart';
 import 'package:auto_run/pages/settings.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:georange/georange.dart';
@@ -117,20 +120,22 @@ class _homeScreenState extends State<homeScreen> {
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
-                  : GoogleMap(
-                      markers: markers,
-                      polylines: polyline,
-                      zoomControlsEnabled: false,
-                      onMapCreated: (GoogleMapController controller) {
-                        myMapController = controller;
-                        setState(() {
-                          myMapController!.setMapStyle(_mapStyleLight);
-                        });
-                      },
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(currentLocation!.latitude!,
-                            currentLocation!.longitude!),
-                        zoom: 15,
+                  : GestureDetector(
+                      child: GoogleMap(
+                        markers: markers,
+                        polylines: polyline,
+                        zoomControlsEnabled: false,
+                        onMapCreated: (GoogleMapController controller) {
+                          myMapController = controller;
+                          setState(() {
+                            myMapController!.setMapStyle(_mapStyleLight);
+                          });
+                        },
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(currentLocation!.latitude!,
+                              currentLocation!.longitude!),
+                          zoom: 15,
+                        ),
                       ),
                     ),
             ),
@@ -140,6 +145,17 @@ class _homeScreenState extends State<homeScreen> {
       ),
     );
   }
+
+  void togglePanel() {
+    if (panalController.isPanelClosed) {
+      panalController.isPanelShown;
+    } else {
+      panalController.close();
+    }
+  }
+
+  late AnimationController _panelAnimationController;
+  late Animation _panelAnimation;
 
   Widget panelWidget(
       {required ScrollController controller,
@@ -420,7 +436,8 @@ class _homeScreenState extends State<homeScreen> {
   }
 
   Widget buildDragHandle() {
-    return InkWell(
+    return GestureDetector(
+      onTap: togglePanel,
       child: Center(
         child: Container(
           width: 50,
@@ -1009,6 +1026,9 @@ class _homeScreenState extends State<homeScreen> {
 int selectedRide = 0;
 
 buildDriversList() {
+  final database = FirebaseDatabase.instance;
+  final driverStatusRef = database.reference().child('drivers/status');
+
   return SizedBox(
     height: 110,
     width: Get.width,

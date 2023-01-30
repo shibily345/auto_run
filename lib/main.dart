@@ -1,13 +1,15 @@
-import 'package:auto_run/core/theam_provider.dart';
-import 'package:auto_run/firebase_options.dart';
+import 'package:auto_run/decision_screen/decission_screen.dart';
+import 'package:auto_run/pages/splash.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
+import 'package:auto_run/core/theam_provider.dart';
+import 'package:auto_run/firebase_options.dart';
+
 import 'controller/auth_controller.dart';
 import 'core/const.dart';
-import 'decision_screen/decission_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

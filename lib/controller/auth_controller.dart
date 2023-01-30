@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:auto_run/core/const.dart';
+import 'package:auto_run/decision_screen/decission_screen.dart';
 import 'package:auto_run/driver/screens/driver_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -89,40 +91,7 @@ class AuthController extends GetxController {
     log("LogedIn");
 
     await FirebaseAuth.instance.signInWithCredential(credential).then((value) {
-      if (isDecided) {
-        isDecided = true;
-        print("called");
-      }
-
-      ///step 1- Check user login?
-      User? user = FirebaseAuth.instance.currentUser;
-
-      if (user != null) {
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get()
-            .then((value) {
-          ///isLoginAsDriver == true means navigate it to driver module
-
-          if (isLoginAsDriver) {
-            if (value.exists) {
-              Get.offAll(() => const DriverHome());
-              print("Driver HOme Screen");
-            } else {
-              Get.offAll(() => const DriverProfileSetup());
-            }
-          } else {
-            if (value.exists) {
-              Get.offAll(() => const homeScreen());
-            } else {
-              Get.offAll(() => const ProfileSettingScreen());
-            }
-          }
-        }).catchError((e) {
-          print("Error while decideRoute is $e");
-        });
-      }
+      decideRoute();
     }).catchError((e) {
       print("Error while sign In $e");
     });
@@ -132,10 +101,9 @@ class AuthController extends GetxController {
 
   decideRoute() {
     if (isDecided) {
-      return;
+      isDecided = true;
+      print("called");
     }
-    isDecided = true;
-    print("called");
 
     ///step 1- Check user login?
     User? user = FirebaseAuth.instance.currentUser;
@@ -152,21 +120,15 @@ class AuthController extends GetxController {
           .then((value) {
         ///isLoginAsDriver == true means navigate it to driver module
 
-        if (isLoginAsDriver) {
-          if (value.exists) {
-            print("Driver HOme Screen");
-          } else {
-            Get.offAll(() => const DriverProfileSetup());
-          }
-        } else {
-          if (value.exists) {
-            Get.offAll(() => const homeScreen());
-          } else {
-            Get.offAll(() => const ProfileSettingScreen());
-          }
+        switch (value.exists) {
+          case true:
+            Get.offAll(() => isLoginAsDriver ? DriverHome() : homeScreen());
+            break;
+          case false:
+            Get.offAll(() => DecisionScreen());
         }
       }).catchError((e) {
-        print("Error while decideRoute is $e");
+        log("Error while decideRoute is $e");
       });
     }
   }
